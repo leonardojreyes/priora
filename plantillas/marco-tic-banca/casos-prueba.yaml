@@ -1,0 +1,96 @@
+# Casos de prueba de la plantilla. Los usa la suite de aceptación (fases 3 a 5).
+# Fuente: ejemplos resueltos del marco §4.4 (árbol) y §7.2 (scoring).
+
+arbol:
+  - nombre: Campo calculado en pantalla de originación, 6 días-persona
+    respuestas: { filtro: true, p2: false, p3: false, p4: false }
+    factores: []
+    datos: { esfuerzo_dias_persona: 6 }
+    esperado: { grupo: requerimientos, factores_contados: 0 }
+  - nombre: RPA ya contratado para conciliación de back office, 45 días-persona
+    respuestas: { filtro: true, p2: false, p3: false, p4: false }
+    factores: [f4]
+    datos: { esfuerzo_dias_persona: 45 }      # f10 se marca automáticamente
+    esperado: { grupo: requerimientos, factores_contados: 2 }
+  - nombre: Nuevo reporte para ente de control con 4 sistemas, datos sensibles, 30 días-persona
+    respuestas: { filtro: true, p2: false, p3: false, p4: false }
+    factores: [f2, f6]
+    datos: { esfuerzo_dias_persona: 30 }
+    esperado: { grupo: proyectos, factores_contados: 3, etapa: pre_proyecto }
+  - nombre: Migrar el módulo de cobranzas a una nueva plataforma, 15 días-persona
+    respuestas: { filtro: true, p2: false, p3: true, p4: false }
+    factores: []
+    datos: { esfuerzo_dias_persona: 15 }
+    esperado: { grupo: proyectos, etapa: pre_proyecto, motivo: determinante_p3 }
+  - nombre: Proyecto con presupuesto en el plan anual
+    respuestas: { filtro: true, p2: true }
+    entrada_directa: presupuesto_plan_anual
+    esperado: { grupo: proyectos, etapa: proyecto_entrada_directa, flujo_siguiente: m2-proyectos }
+  - nombre: Mandato regulatorio sin verificación confirmada
+    respuestas: { filtro: true, p2: true }
+    entrada_directa: mandato_regulatorio
+    marcas: { origen_normativo_verificado: pendiente }
+    esperado: { grupo: proyectos, etapa: pre_proyecto, flujo_siguiente: m1-requerimientos }
+  - nombre: Necesidad mal definida
+    respuestas: { filtro: false }
+    esperado: { resultado: devolver }
+
+scoring:
+  - nombre: Validación de identidad adicional en originación digital (Evolutivo)
+    modelo: modelo-requerimientos
+    calificaciones: { alineacion: 4, riesgo_cumplimiento: 3, impacto: 5, esfuerzo_capacidad: 4 }
+    justificaciones_obligatorias: [alineacion, esfuerzo_capacidad]
+    esperado: { total: 4.00, banda: alta, nucleo_comun: 4.00 }
+  - nombre: Motor antifraude para canal digital (Proyecto Estratégico)
+    modelo: modelo-proyectos
+    calificaciones: { alineacion: 5, valor_economico: 4, riesgo_cumplimiento: 5, impacto_cliente: 4, impacto_negocio: 4, viabilidad_capacidad: 3 }
+    esperado: { total: 4.20, banda: alta, nucleo_comun: 4.67 }
+  - nombre: Sin objetivo estratégico no puede superar 1 en alineación
+    modelo: modelo-requerimientos
+    demanda: { objetivo_estrategico: null }
+    calificaciones: { alineacion: 3, riesgo_cumplimiento: 3, impacto: 3, esfuerzo_capacidad: 3 }
+    esperado: { error: alineacion_sin_objetivo }
+
+recorridos:
+  - nombre: Evolutivo de punta a punta sin proveedor
+    flujos: [m0-entrada, m1-requerimientos, sub-construir, sub-certificar-implementar]
+    pasos:
+      - { nodo: validar, accion: clasificable }
+      - { nodo: clasificar, datos: { categoria: evolutivo, origen_normativo: no_aplica }, accion: clasificar }
+      - { nodo: registrar-origen, accion: confirmar }
+      - { esperado_flujo: m1-requerimientos, esperado_identificadores: [DEM] }
+      - { nodo: definir-requisitos, vars: { requiere_proveedor: false }, accion: completar }
+      - { nodo: gestionar-recursos, accion: completar }
+      - { nodo: analizar, evaluacion: { total: 4.0 }, accion: completar }
+      - { nodo: priorizar, sesion: { quorum: true, capacidad_completa: true }, decision: prioritario }
+      - { nodo: iniciar-planificar, accion: completar }
+      - { subflujo: sub-construir, nodos: [elegir-definicion:no, definir-nucleo, aprobar-definiciones:aprobar, desarrollar] }
+      - { subflujo: sub-certificar-implementar, nodos: [certificar:certificado, uat:conforme, decision-pase:aprobar, implementar:exitoso] }
+      - { nodo: validar-satisfaccion, accion: completar }
+      - { nodo: verificar-cierre, accion: cerrar }
+    esperado: { estado: finalizado, resultado: completado }
+  - nombre: Pre-proyecto validado que llega a proyecto aprobado
+    pasos:
+      - { nodo: clasificar, datos: { grupo: proyectos, entrada_directa: null }, accion: clasificar }
+      - { esperado_identificadores: [DEM, PPY] }
+      - { nodo: priorizar, decision: validar_elevar }
+      - { esperado_flujo: m2-proyectos, esperado_etapa: proyecto_propuesto }
+      - { nodo: comision, decision: prioritario }
+      - { esperado_identificadores: [DEM, PPY, PRY], esperado_etapa: proyecto_aprobado }
+  - nombre: Revisión ejecutiva desfavorable
+    pasos:
+      - { nodo: priorizar, pronunciamiento: desfavorable }
+    esperado: { resultado: devuelto, no_aparece_en_agenda: true }
+  - nombre: Diferido que agota sus reevaluaciones
+    pasos:
+      - { nodo: priorizar, decision: diferir }
+      - { avanzar_dias: 15, nodo: priorizar, decision: diferir }
+      - { avanzar_dias: 15, nodo: priorizar, decisiones_disponibles_no_incluyen: diferir }
+  - nombre: Devuelta que no se reingresa
+    pasos:
+      - { nodo: validar, datos: { clasificable: false, informacion_faltante: "Falta el proceso afectado" }, accion: devolver }
+      - { avanzar_dias_habiles: 11 }
+    esperado: { estado: cancelado, resultado: cancelado }
+  - nombre: Sesión sin capacidad completa no prioriza, salvo fecha externa
+    pasos:
+      - { sesion: { capacidad_falta_area: riesgos }, item_comun: { decision_permitida: false }, item_con_fecha_regulatoria: { decision_permitida: true } }

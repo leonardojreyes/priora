@@ -1,0 +1,15 @@
+clave: solicitud
+nombre: Solicitud de TI
+version: 1
+emision: completo
+secciones:
+  - clave: datos
+    titulo: Datos de la solicitud
+    editable_por: [{ rol_demanda: solicitante }]
+    campos:
+      - { clave: titulo, tipo: texto, etiqueta: Título, obligatorio: true, max: 150, nucleo: titulo }
+      - { clave: area_solicitante, tipo: area, etiqueta: Área, obligatorio: true, nucleo: area_solicitante }
+      - { clave: descripcion, tipo: texto_largo, etiqueta: "¿Qué necesita y para qué?", obligatorio: true }
+      - { clave: urgencia, tipo: lista, catalogo: urgencia, etiqueta: Urgencia, obligatorio: true, nucleo: urgencia_declarada }
+      - { clave: fecha_deseada, tipo: fecha, etiqueta: Fecha deseada, obligatorio: false }
+      - { clave: adjuntos, tipo: adjunto, etiqueta: Adjuntos, multiple: true, obligatorio: false }

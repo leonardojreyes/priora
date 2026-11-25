@@ -1,0 +1,32 @@
+zona_horaria: America/Guayaquil
+idioma: es-EC
+moneda: USD
+calendario:
+  dias_habiles: [lun, mar, mie, jue, vie]
+  # Feriados nacionales de Ecuador: la empresa los carga o importa cada año (Administración › Empresa).
+  feriados: []
+identificadores:
+  # {AAAA} año de asignación; {N:4} secuencia con relleno; la secuencia reinicia cada año.
+  demanda: "DEM-{AAAA}-{N:4}"
+  pre_proyecto: "PPY-{AAAA}-{N:3}"
+  proyecto: "PRY-{AAAA}-{N:3}"
+  historia_usuario: "HU-{PRODUCTO}-{N:4}"
+  cambio_demanda: "CHG-{DEM}-{N:2}"        # p. ej. CHG-DEM-2026-0142-01
+  cambio_proyecto: "CHG-{PRY}-{N:2}"
+  sesion: "{INSTANCIA}-{AAAA}-{N:3}"
+marca:
+  logo: null
+  color_primario: null      # se toma del sistema de diseño si no se define
+modulos:
+  - entrada
+  - requerimientos
+  - proyectos
+  - priorizacion
+  - capacidad
+  - sesiones
+  - indicadores
+# Umbrales disponibles para reglas como config.*
+umbrales:
+  umbral_inversion_baja: 10000         # USD; hasta este monto basta la estimación en la ficha 9.3 (marco §6.5.1)
+  esfuerzo_referencia_dias_persona: 20
+  duracion_referencia_semanas: 4

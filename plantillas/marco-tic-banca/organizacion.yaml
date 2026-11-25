@@ -1,0 +1,52 @@
+# Áreas con nombres neutrales; cada empresa las renombra (el código usa solo la clave).
+# tipos: solicitante | ejecutora | consultiva | reporta_capacidad | obligatoria_en_capacidad | verificadora_normativa
+areas:
+  - { clave: tecnologia, nombre: Tecnología, tipos: [solicitante, ejecutora, reporta_capacidad, obligatoria_en_capacidad] }
+  - { clave: arquitectura, nombre: Arquitectura, padre: tecnologia, tipos: [consultiva, reporta_capacidad] }
+  - { clave: mesa-servicio, nombre: Mesa de Servicio, padre: tecnologia, tipos: [] }
+  - { clave: laboratorio-qa, nombre: Laboratorio QA, padre: tecnologia, tipos: [ejecutora] }
+  - { clave: gestion-procesos, nombre: Gestión de Procesos, tipos: [solicitante, ejecutora, consultiva, reporta_capacidad, obligatoria_en_capacidad] }
+  - { clave: seguridad-informacion, nombre: Seguridad de la Información, tipos: [solicitante, consultiva, reporta_capacidad, obligatoria_en_capacidad] }
+  - { clave: riesgos, nombre: Riesgos, tipos: [solicitante, consultiva, reporta_capacidad, obligatoria_en_capacidad] }
+  - { clave: cumplimiento, nombre: Cumplimiento, tipos: [solicitante, consultiva, verificadora_normativa] }
+  - { clave: administracion, nombre: Administración (Compras), tipos: [solicitante] }
+  - { clave: financiera, nombre: Área Financiera, tipos: [solicitante, consultiva] }
+  - { clave: planificacion-estrategica, nombre: Planificación Estratégica, tipos: [consultiva] }
+  - { clave: legal, nombre: Legal, tipos: [consultiva] }
+  - { clave: talento-humano, nombre: Talento Humano, tipos: [solicitante, consultiva] }
+  - { clave: transformacion, nombre: Transformación Estratégica, tipos: [] }
+  - { clave: pmo, nombre: PMO, padre: transformacion, tipos: [] }
+  # Áreas de negocio de ejemplo; la empresa carga las suyas.
+  - { clave: negocio-banca-personas, nombre: Banca de Personas, tipos: [solicitante] }
+  - { clave: negocio-operaciones, nombre: Operaciones, tipos: [solicitante] }
+
+# Roles funcionales (papel en el proceso). Se asignan a usuarios con alcance: empresa | area:<clave>
+roles_funcionales:
+  - { clave: pm_demanda, nombre: PM de demanda, descripcion: Registra, clasifica, pre-prioriza y da seguimiento hasta el traspaso }
+  - { clave: pmo, nombre: Responsable de la PMO }
+  - { clave: pm_proyecto_elegible, nombre: PM de proyecto (elegible), descripcion: Personas que la PMO puede asignar como PM de proyecto }
+  - { clave: analista_negocio, nombre: Analista de negocio }
+  - { clave: cio, nombre: CIO }
+  - { clave: revisor_ejecutivo, nombre: Revisor ejecutivo (Vicepresidencia Ejecutiva) }
+  - { clave: oficial_datos, nombre: Oficial de protección de datos }
+  - { clave: verificador_normativo, nombre: Verificador normativo, descripcion: Confirma origen normativo y fecha }
+  - { clave: comprador, nombre: Analista de compras }
+  - { clave: analista_financiero, nombre: Analista financiero }
+  - { clave: planificador_estrategico, nombre: Planificador estratégico }
+  - { clave: responsable_capacidad, nombre: Responsable de reportar capacidad }
+  - { clave: representante_mesa_servicio, nombre: Representante de Mesa de Servicio }
+  - { clave: tecnico_referencia, nombre: Técnico de referencia }
+
+# Roles que se asignan por demanda (no por usuario global)
+roles_demanda:
+  - { clave: solicitante, nombre: Solicitante }
+  - { clave: dueno_funcional, nombre: Dueño funcional }
+  - { clave: delegado_funcional, nombre: Delegado funcional }
+  - { clave: sponsor, nombre: Sponsor }
+  - { clave: responsable_asignado, nombre: Responsable asignado }
+  - { clave: pm_proyecto, nombre: PM de proyecto }
+  - { clave: analista_asignado, nombre: Analista de negocio asignado }
+
+incompatibilidades:
+  # Marco §8.3: la misma persona no puede ser PM de demanda y PM de proyecto del mismo ítem en la aprobación
+  - { roles: [pm_demanda, pm_proyecto], ambito: demanda, momento: aprobacion }

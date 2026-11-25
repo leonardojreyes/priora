@@ -1,0 +1,277 @@
+# Marco 2: proyectos (marco §6; BPMN docs/referencia/img/bpmn-marco2-proyectos.png)
+# Dos entradas: proyecto propuesto (desde m1) y entrada directa (desde m0). Ambas empiezan aquí.
+clave: m2-proyectos
+nombre: Gestión de proyectos
+version: 1
+contexto_inicial: { tramo: analisis }
+inicio: definir-caso
+
+nodos:
+  # ── Fase 1 · Levantamiento del proyecto ───────────────────────────────────────
+  - id: definir-caso
+    tipo: tarea
+    nombre: Definir requisitos y caso de negocio
+    responsable: { rol_demanda: dueno_funcional }
+    colaboradores: [{ rol_demanda: sponsor }]
+    al_entrar:
+      - fijar_fecha: { campo: fecha_inicio_levantamiento, valor: hoy }
+      - crear_registro: { instrumento: ficha-preproyecto, prellenar_desde: ultima_version }   # en proyecto propuesto completa la ficha sin rehacerla
+    instrumentos: [{ clave: ficha-preproyecto, modo: editar, obligatorio: true }]
+    preguntas:
+      - { clave: requiere_proveedor, tipo: si_no, etiqueta: "¿Se requiere proveedor?", obligatorio: true, prellenar: vars.requiere_proveedor }
+      - { clave: sponsor, tipo: usuario, etiqueta: Sponsor, obligatorio: true }
+    acciones_usuario:
+      - clave: completar
+        etiqueta: Caso de negocio listo
+        a: requiere-proveedor
+        acciones: [{ asignar_rol_demanda: { rol: sponsor, desde: vars.sponsor } }, { traspasar_seguimiento: { a: { rol: pm_demanda } } }]
+
+  - id: requiere-proveedor
+    tipo: decision
+    reglas:
+      - { si: { and: [{ "==": [{ var: vars.requiere_proveedor }, true] }, { "!": [{ var: registros.ficha-proveedor.cotizaciones }] }] }, a: cotizar }
+    por_defecto: validar-documentacion
+
+  - id: cotizar
+    tipo: tarea
+    nombre: Generar cotizaciones con NDA firmado
+    responsable: { area: administracion, rol: comprador }
+    instrumentos: [{ clave: ficha-proveedor, seccion: cotizacion, modo: editar }]
+    condicion_completar: { "!!": [{ var: registros.ficha-proveedor.nda_adjunto }] }
+    acciones_usuario: [{ clave: completar, etiqueta: Cotizaciones listas, a: validar-documentacion }]
+
+  - id: validar-documentacion
+    tipo: tarea
+    nombre: Validar documentación
+    responsable: { rol: pm_demanda }
+    acciones_usuario:
+      - { clave: completa, etiqueta: Documentación completa, a: estimar-capex-opex }
+      - { clave: incompleta, etiqueta: Devolver para completar, a: definir-caso, requiere_justificacion: true }
+
+  - id: estimar-capex-opex
+    tipo: tarea
+    nombre: Estimar CAPEX y OPEX
+    responsable: { area: administracion }
+    instrumentos: [{ clave: costo-retorno, seccion: capex_opex, modo: editar, si: { ">": [{ var: demanda.presupuesto_referencial }, { var: config.umbral_inversion_baja }] } }]
+    acciones_usuario: [{ clave: completar, etiqueta: Estimación lista, a: analisis-financiero }]
+
+  - id: analisis-financiero
+    tipo: tarea
+    nombre: Análisis económico y financiero
+    responsable: { area: financiera, rol: analista_financiero }
+    instrumentos: [{ clave: costo-retorno, seccion: analisis, modo: emitir, si: { ">": [{ var: demanda.presupuesto_referencial }, { var: config.umbral_inversion_baja }] } }]
+    acciones_usuario: [{ clave: completar, etiqueta: Análisis emitido, a: scoring }]
+
+  # ── Fase 2 · Priorización y aprobación ────────────────────────────────────────
+  - id: scoring
+    tipo: tarea
+    nombre: Calcular el scoring y pre-priorizar
+    responsable: { rol: pm_demanda }
+    instrumentos: [{ evaluacion: modelo-proyectos }]
+    acciones_usuario: [{ clave: completar, etiqueta: Scoring listo, a: validar-alineacion }]
+
+  - id: validar-alineacion
+    tipo: tarea
+    nombre: Validar la alineación estratégica
+    responsable: { area: planificacion-estrategica, rol: planificador_estrategico }
+    instrumentos: [{ evaluacion: modelo-proyectos, criterios: [alineacion], modo: validar }]
+    acciones_usuario: [{ clave: completar, etiqueta: Alineación validada, a: comision }]
+
+  - id: comision
+    tipo: sesion
+    nombre: Priorizar y aprobar en la Comisión de proyectos
+    instancia: comision-proyectos
+    motivo: aprobar
+    al_entrar: [{ cambiar_tramo: { valor: priorizacion } }]
+    requisitos:
+      - { evaluacion_vigente: true }
+      - { alineacion_validada: true }
+      - { capacidad_completa: true, excepto_si: { tiene_marca: [obligacion_externa, [regulatoria]] } }
+      - { presentacion_sponsor_adjunta: true }
+      - { sin_bloqueo_privacidad: true }
+    revision_previa:
+      instancia: revision-ejecutiva
+      omitir_si: { revisado_antes_sin_cambio_material: true }
+      si_desfavorable: { a: devuelto-por-revision }
+    decisiones:
+      - clave: prioritario
+        a: asignar-pry
+        acciones: [{ fijar_fecha: { campo: fecha_decision, valor: hoy } }]
+      - clave: diferir
+        a: comision
+        si: { "!": [{ var: demanda.diferimiento.ultima_reevaluacion }] }
+        acciones: [{ iniciar_diferimiento: { desde_instancia: true } }, { cambiar_tramo: { valor: diferido } }]
+      - { clave: rechazar, a: rechazado, requiere_justificacion: true }
+      - { clave: dar_plazo, a: comision, maximo: 1 }
+
+  - id: devuelto-por-revision
+    tipo: fin
+    resultado: devuelto
+    acciones: [{ cambiar_estado: { valor: cancelado } }, { notificar: { plantilla: devuelta-por-revision-ejecutiva, a: [{ rol_demanda: solicitante }, { rol_demanda: sponsor }] } }]
+
+  - id: rechazado
+    tipo: fin
+    resultado: rechazado
+    acciones: [{ cambiar_estado: { valor: cancelado } }, { notificar: { plantilla: proyecto-rechazado, a: [{ rol_demanda: solicitante }, { rol_demanda: sponsor }] } }]
+
+  - id: asignar-pry
+    tipo: accion
+    nombre: Asignar identificador de proyecto
+    acciones:
+      - asignar_identificador: { tipo: proyecto }
+      - cambiar_grupo_categoria: { etapa: proyecto_aprobado }
+      - notificar: { plantilla: proyecto-aprobado, a: [{ rol_demanda: sponsor }, { rol_demanda: solicitante }, { rol: pmo }] }
+    salidas:
+      - { a: esperar-inicio, si: { "!!": [{ var: decision.fecha_inicio_programado }] } }
+      - { a: nombrar-pm }
+
+  - id: esperar-inicio
+    tipo: temporizador
+    nombre: Aprobado con inicio programado
+    al_entrar: [{ cambiar_tramo: { valor: espera_capacidad } }, { fijar_fecha: { campo: fecha_inicio_programado, desde: decision.fecha_inicio_programado } }]
+    hasta: { var: demanda.fecha_inicio_programado }
+    recordatorio_previo: { dias_calendario: 30, crear_tarea: { nombre: Confirmar capacidad y presupuesto reservado, responsable: { rol: pm_demanda } } }
+    salidas: [{ a: nombrar-pm }]
+
+  # ── Fase 3 · Inicio y planificación ───────────────────────────────────────────
+  - id: nombrar-pm
+    tipo: tarea
+    nombre: Nombrar al PM de proyecto y al equipo
+    responsable: { rol: pmo }
+    al_entrar: [{ cambiar_tramo: { valor: ejecucion } }]
+    preguntas:
+      - { clave: pm_proyecto, tipo: usuario, etiqueta: PM de proyecto, obligatorio: true, filtro_rol: pm_proyecto_elegible }
+      - { clave: analista, tipo: usuario, etiqueta: Analista de negocio, obligatorio: false, filtro_rol: analista_negocio }
+    acciones_usuario:
+      - clave: completar
+        etiqueta: Nombrados
+        a: discovery-aplica
+        acciones:
+          - asignar_rol_demanda: { rol: pm_proyecto, desde: vars.pm_proyecto }
+          - asignar_rol_demanda: { rol: analista_asignado, desde: vars.analista }
+          - traspasar_seguimiento: { a: { rol_demanda: pm_proyecto } }
+
+  - id: discovery-aplica
+    tipo: decision
+    nombre: "¿Discovery obligatorio?"
+    reglas:
+      - { si: { en_categoria_con_flag: [discovery, obligatorio] }, a: discovery }
+    por_defecto: decidir-discovery
+
+  - id: decidir-discovery
+    tipo: decision_humana
+    nombre: "¿Se hará Discovery? (opcional para esta categoría)"
+    responsable: { rol_demanda: pm_proyecto }
+    opciones:
+      - { clave: si, etiqueta: Hacer Discovery, a: discovery }
+      - { clave: no, etiqueta: Omitir, a: firmar-acta, requiere_justificacion: true }
+
+  - id: discovery
+    tipo: tarea
+    nombre: Discovery (qué va, qué no va, pendientes)
+    responsable: { rol_demanda: pm_proyecto }
+    colaboradores: [{ rol_demanda: analista_asignado }, { area: laboratorio-qa }]
+    instrumentos: [{ clave: acta-constitucion, seccion: discovery, modo: editar }]
+    acciones_usuario: [{ clave: completar, etiqueta: Discovery cerrado, a: firmar-acta }]
+
+  - id: firmar-acta
+    tipo: tarea
+    nombre: Revisión técnica temprana, acta y plan
+    responsable: { rol_demanda: pm_proyecto }
+    colaboradores: [{ area: arquitectura }]
+    instrumentos:
+      - { clave: acta-constitucion, modo: emitir, firmas: [{ rol_demanda: pm_proyecto }, { rol_demanda: sponsor }] }
+      - { clave: matriz-riesgos, modo: emitir }
+    acciones_usuario:
+      - clave: completar
+        etiqueta: Acta firmada
+        a: contratar
+        acciones:
+          - fijar_fecha: { campo: fecha_linea_base, desde: registros.acta-constitucion.fecha_fin }
+          - fijar_fecha: { campo: fecha_vigente, desde: registros.acta-constitucion.fecha_fin }
+          - fijar_fecha: { campo: fecha_inicio, valor: hoy }
+
+  - id: contratar
+    tipo: decision
+    reglas:
+      - { si: { "==": [{ var: vars.requiere_proveedor }, true] }, a: seleccionar-contratar }
+    por_defecto: ejecucion
+
+  - id: seleccionar-contratar
+    tipo: tarea
+    nombre: Seleccionar y contratar
+    responsable: { area: administracion, rol: comprador }
+    instrumentos: [{ clave: ficha-proveedor, seccion: contratacion, modo: emitir }]
+    acciones_usuario: [{ clave: completar, etiqueta: Contratado, a: ejecucion }]
+
+  # ── Fases 4 y 5 · Ejecución, control y transición (tres frentes en paralelo) ──
+  - id: ejecucion
+    tipo: inclusivo
+    al_entrar: [{ cambiar_estado: { valor: en_ejecucion } }]
+    ramas:
+      - { a: gestionar-controlar }
+      - { a: construir }
+      - { a: supervisar-contrato, si: { "==": [{ var: vars.requiere_proveedor }, true] } }
+
+  - id: gestionar-controlar
+    tipo: tarea
+    nombre: Gestionar y controlar el proyecto
+    responsable: { rol_demanda: pm_proyecto }
+    recurrente: { cada: { dias_habiles: 10 }, instrumento: informe-estado }
+    instrumentos: [{ clave: matriz-riesgos, modo: editar }]
+    condicion_completar: { subflujos_terminados: [construir, transicion] }
+    acciones_usuario: [{ clave: completar, etiqueta: Gestión concluida, a: union-ejecucion }]
+
+  - id: construir
+    tipo: subflujo
+    nombre: Construir y asegurar calidad (etapas 1 y 2)
+    flujo: sub-construir
+    salidas: [{ a: transicion }]
+
+  - id: transicion
+    tipo: subflujo
+    nombre: Transición a producción (etapas 3 y 4)
+    flujo: sub-certificar-implementar
+    parametros: { registra_pase: { rol_demanda: pm_proyecto }, firma_pase: { rol_demanda: sponsor } }
+    salidas: [{ a: union-ejecucion }]
+
+  - id: supervisar-contrato
+    tipo: tarea
+    nombre: Supervisar el contrato (dimensión funcional)
+    responsable: { rol_demanda: dueno_funcional }
+    condicion_completar: { subflujos_terminados: [transicion] }
+    acciones_usuario: [{ clave: completar, etiqueta: Supervisión concluida, a: union-ejecucion }]
+
+  - { id: union-ejecucion, tipo: union_inclusiva, espera: [gestionar-controlar, transicion, supervisar-contrato], salidas: [{ a: verificar-evidencia }] }
+
+  # ── Fase 6 · Cierre y beneficios ──────────────────────────────────────────────
+  - id: verificar-evidencia
+    tipo: tarea
+    nombre: Verificar la evidencia de aceptación
+    responsable: { area: gestion-procesos }
+    al_entrar: [{ cambiar_tramo: { valor: cierre } }]
+    acciones_usuario: [{ clave: completar, etiqueta: Evidencia verificada, a: cerrar-proyecto }]
+
+  - id: cerrar-proyecto
+    tipo: tarea
+    nombre: "Cerrar el proyecto: acta de cierre y expediente"
+    responsable: { rol: pmo }
+    instrumentos: [{ clave: acta-cierre, modo: emitir, firmas: [{ rol_demanda: sponsor }, { rol_demanda: pm_proyecto }, { rol: pmo }, { area: financiera }] }]
+    condicion_completar: { expediente_completo: true }
+    acciones_usuario: [{ clave: completar, etiqueta: Acta de cierre firmada, a: verificar-beneficios }]
+
+  - id: verificar-beneficios
+    tipo: tarea
+    nombre: Verificar beneficios
+    responsable: { area: financiera, rol: analista_financiero }
+    colaboradores: [{ rol_demanda: pm_proyecto }]
+    instrumentos: [{ clave: seguimiento-beneficios, modo: emitir }]
+    acciones_usuario: [{ clave: completar, etiqueta: Beneficios verificados, a: cerrado }]
+
+  - id: cerrado
+    tipo: fin
+    resultado: completado
+    acciones:
+      - cambiar_estado: { valor: finalizado }
+      - fijar_fecha: { campo: fecha_cierre, valor: hoy }
+      - notificar: { plantilla: proyecto-cerrado, a: [{ rol_demanda: sponsor }, { instancia: comision-proyectos }] }

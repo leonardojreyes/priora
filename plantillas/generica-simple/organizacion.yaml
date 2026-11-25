@@ -1,0 +1,11 @@
+areas:
+  - { clave: ti, nombre: Sistemas, tipos: [solicitante, ejecutora, reporta_capacidad] }
+  - { clave: ventas, nombre: Ventas, tipos: [solicitante] }
+  - { clave: finanzas, nombre: Finanzas, tipos: [solicitante] }
+  - { clave: operaciones, nombre: Operaciones, tipos: [solicitante] }
+roles_funcionales:
+  - { clave: analista_ti, nombre: Analista de TI }
+  - { clave: gerente_ti, nombre: Gerente de TI }
+roles_demanda:
+  - { clave: solicitante, nombre: Solicitante }
+  - { clave: responsable_asignado, nombre: Responsable }

@@ -1,0 +1,4 @@
+tramos:
+  - { clave: evaluacion, desde: demanda_registrada, hasta: evaluacion_completada, dh: 5, al_vencer: notificar }
+semaforo:
+  - { grupo: solicitudes, umbral_amarillo_dias: 3, plazo_objetivo: fijado_en_inicio }

@@ -1,0 +1,14 @@
+escala: { min: 1, max: 5, anclas_sin_justificacion: [1, 3, 5] }
+bandas:
+  - { clave: alta, desde: 3.5, recomendacion: priorizar_si_hay_capacidad }
+  - { clave: baja, desde: 0, recomendacion: diferir_o_rechazar }
+banderas: []
+modelos:
+  - clave: modelo-simple
+    nombre: Valor y esfuerzo
+    aplica_a: { grupos: [solicitudes] }
+    criterios:
+      - { clave: valor, nombre: Valor para el negocio, peso: 0.5, ancla_1: Bajo, ancla_3: Medio, ancla_5: Alto }
+      - { clave: urgencia, nombre: Urgencia, peso: 0.2, ancla_1: Puede esperar, ancla_3: Este trimestre, ancla_5: Inmediata }
+      - { clave: esfuerzo, nombre: Facilidad (inverso del esfuerzo), peso: 0.3, fuente: capacidad, ancla_1: Muy costoso, ancla_3: Medio, ancla_5: Rápido }
+    nucleo_comun: { valor: [valor], urgencia: [urgencia], esfuerzo: [esfuerzo] }

@@ -1,0 +1,20 @@
+# Plazos máximos hasta la decisión (marco §11.3). dh = días hábiles
+tramos:
+  - { clave: registro_clasificacion, desde: demanda_registrada, hasta: demanda_clasificada, dh: 3, al_vencer: agendar_con_prioridad }
+  - { clave: verificacion_origen, desde: verificacion_solicitada, hasta: verificacion_respondida, dh: 2, al_vencer: clasificar_con_declaracion }
+  - { clave: reingreso_devuelta, desde: demanda_devuelta, hasta: demanda_reingresada, dh: 10, al_vencer: cancelar }
+  - { clave: clasificacion_sesion_requerimiento, desde: demanda_clasificada, hasta: decision_registrada, dh: 10, aplica_si: { grupo: requerimientos }, al_vencer: entra_con_informacion_disponible }
+  - { clave: clasificacion_sesion_preproyecto, desde: demanda_clasificada, hasta: decision_registrada, dh: 20, aplica_si: { etapa: pre_proyecto }, al_vencer: ofrecer_dar_plazo_o_rechazar }
+  - { clave: levantamiento_comision, desde: levantamiento_iniciado, hasta: decision_registrada, dh: 30, aplica_si: { grupo: proyectos }, al_vencer: ofrecer_dar_plazo_o_rechazar }
+
+# Plazo objetivo orientativo y umbral amarillo del semáforo (marco §11.2). n en días calendario
+semaforo:
+  - { categoria: solicitud-informacion, umbral_amarillo_dias: 2, plazo_objetivo: fijado_en_inicio }
+  - { categoria: poc-estimaciones, umbral_amarillo_dias: 3, plazo_objetivo: declarado_en_analisis }
+  - { categoria: evolutivo, umbral_amarillo_dias: 5, plazo_objetivo: fijado_en_inicio }
+  - { categoria: requerimientos-it4it, umbral_amarillo_dias: 5, plazo_objetivo: fijado_en_inicio }
+  - { categoria: cumplimiento-normativo, umbral_amarillo_dias: 10, plazo_objetivo: fecha_limite_externa_o_inicio }
+  - { categoria: mandatos-franquicias, umbral_amarillo_dias: 10, plazo_objetivo: fecha_limite_externa_o_inicio }
+  - { etapa: pre_proyecto, umbral_amarillo_dias: 5, plazo_objetivo: fecha_presentacion_mesa }
+  - { etapa: [proyecto_propuesto, proyecto_entrada_directa], umbral_amarillo_dias: 5, plazo_objetivo: fecha_presentacion_comision }
+  - { grupo: proyectos, etapa: proyecto_aprobado, umbral_amarillo_dias: 15, plazo_objetivo: fecha_fin_acta }

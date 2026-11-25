@@ -1,0 +1,16 @@
+recorridos:
+  - nombre: Solicitud aprobada y terminada
+    pasos:
+      - { esperado_identificadores: [SOL] }
+      - { nodo: evaluar, vars: { categoria: mejora, horas_estimadas: 16 }, evaluacion: { valor: 5, urgencia: 3, esfuerzo: 3 }, accion: completar }
+      - { esperado_evaluacion: { total: 4.0, banda: alta } }
+      - { nodo: aprobar, opcion: aprobar }
+      - { nodo: asignar, accion: completar }
+      - { nodo: ejecutar, accion: completar }
+      - { nodo: confirmar, accion: conforme }
+    esperado: { estado: terminada, resultado: completado }
+  - nombre: Solicitud descartada
+    pasos:
+      - { nodo: evaluar, accion: completar }
+      - { nodo: aprobar, opcion: descartar, justificacion: "Fuera de alcance" }
+    esperado: { estado: descartada, resultado: rechazado }

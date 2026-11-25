@@ -1,0 +1,16 @@
+grupos:
+  - { clave: solicitudes, nombre: Solicitudes, flujo: solicitud-ti }
+categorias:
+  - { clave: mejora, grupo: solicitudes, nombre: Mejora, flags: {} }
+  - { clave: nuevo-desarrollo, grupo: solicitudes, nombre: Nuevo desarrollo, flags: {} }
+  - { clave: reporte, grupo: solicitudes, nombre: Reporte o datos, flags: { sin_pase_produccion: true } }
+etapas: []
+estados:
+  - { clave: abierta, nombre: Abierta }
+  - { clave: en_curso, nombre: En curso }
+  - { clave: terminada, nombre: Terminada, terminal: true }
+  - { clave: descartada, nombre: Descartada, terminal: true, sale_de_semaforo: true }
+tramos: [evaluacion, aprobacion, ejecucion, cierre]
+marcas: []
+catalogos:
+  urgencia: [normal, urgente]

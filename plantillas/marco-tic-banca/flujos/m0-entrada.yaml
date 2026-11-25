@@ -1,0 +1,143 @@
+# Marco 0: entrada única y triage (marco §4.4; BPMN docs/referencia/img/bpmn-marco0-triage.png)
+clave: m0-entrada
+nombre: Entrada y clasificación de la demanda
+version: 1
+dispara: demanda_creada          # flujo que inicia el canal único
+contexto_inicial: { tramo: triage }
+inicio: registrar
+
+nodos:
+  # Actividad 1 (ingresar) ocurre en el canal único antes de que exista la instancia de proceso.
+  - id: registrar
+    tipo: accion
+    nombre: Registrar la demanda y asignar su ID
+    acciones:
+      - asignar_identificador: { tipo: demanda }
+      - emitir_registro: { instrumento: ficha-demanda, seccion: A }
+      - fijar_fecha: { campo: fecha_registro, valor: hoy }
+      - asignar_rol_demanda: { rol: solicitante, desde: creador }
+      - traspasar_seguimiento: { a: { rol: pm_demanda } }
+      - notificar: { plantilla: demanda-registrada, a: [{ rol_demanda: solicitante }, { instancia: mesa-triage }] }
+    salidas: [{ a: validar }]
+
+  - id: validar
+    tipo: tarea
+    nombre: Validar completitud
+    responsable: { instancia: mesa-triage }
+    instrumentos: [{ clave: ficha-demanda, seccion: B, campos: [clasificable, informacion_faltante, duplicado_de], modo: editar }]
+    plazo: { tramo: registro_clasificacion }
+    acciones_usuario:
+      - { clave: clasificable, etiqueta: Es clasificable, a: clasificar, si: { "==": [{ var: registros.ficha-demanda.B.clasificable }, true] } }
+      - { clave: devolver, etiqueta: Devolver al área, a: devuelta, si: { "==": [{ var: registros.ficha-demanda.B.clasificable }, false] } }
+      - { clave: duplicado, etiqueta: Cerrar por duplicado, a: cerrada-duplicado, si: { "!!": [{ var: registros.ficha-demanda.B.duplicado_de }] }, requiere_justificacion: true }
+
+  - id: devuelta
+    tipo: tarea
+    nombre: Completar y reingresar la demanda
+    responsable: { rol_demanda: solicitante }
+    al_entrar:
+      - fijar_fecha: { campo: fecha_devolucion, valor: hoy }
+      - notificar: { plantilla: demanda-devuelta, a: [{ rol_demanda: solicitante }] }
+    instrumentos: [{ clave: ficha-demanda, seccion: A, modo: editar }]
+    plazo:
+      tramo: reingreso_devuelta
+      al_vencer:
+        - cambiar_estado: { valor: cancelado }
+        - notificar: { plantilla: demanda-cancelada-por-vencimiento, a: [{ rol_demanda: solicitante }] }
+        - mover: { a: cancelada }
+    acciones_usuario:
+      - { clave: reingresar, etiqueta: Reingresar, a: validar, acciones: [{ emitir_registro: { instrumento: ficha-demanda, seccion: A } }] }
+      - { clave: desistir, etiqueta: Desistir, a: cancelada, acciones: [{ cambiar_estado: { valor: cancelado } }] }
+
+  - id: clasificar
+    tipo: tarea
+    nombre: Clasificar el grupo con el árbol y asignar la categoría
+    responsable: { rol: pm_demanda }
+    instrumentos: [{ clave: ficha-demanda, seccion: B, campos: [resultado_arbol, grupo, categoria, razon_categoria, obligacion_externa, referencia_obligacion, fecha_limite_externa, origen_normativo, ente_emisor, fecha_notificacion, entrada_directa, referencia_entrada_directa, urgencia_validada, razon_urgencia], modo: editar }]
+    acciones_usuario:
+      - { clave: clasificar, etiqueta: Clasificar, a: origen-declarado }
+
+  - id: origen-declarado
+    tipo: decision
+    nombre: "¿El área declara origen normativo?"
+    reglas:
+      - si: { or: [{ "!=": [{ var: registros.ficha-demanda.B.origen_normativo }, no_aplica] }, { en_categoria_con_flag: requiere_verificacion_origen }] }
+        a: verificar-origen
+    por_defecto: registrar-origen
+
+  - id: verificar-origen
+    tipo: tarea
+    nombre: Verificar norma, aplicabilidad y fecha
+    responsable: { area: cumplimiento, rol: verificador_normativo }
+    al_entrar: [{ marcar: { marca: origen_normativo_verificado, valor: pendiente } }]
+    instrumentos: [{ clave: verificacion-origen, modo: editar }]   # formulario breve: confirma, fecha límite, alcance normativo
+    plazo:
+      tramo: verificacion_origen
+      al_vencer:
+        - registrar_evento: { tipo: verificacion_vencida }
+        - mover: { a: registrar-origen }
+    acciones_usuario:
+      - { clave: confirmar, etiqueta: Confirmado, a: registrar-origen, acciones: [{ marcar: { marca: origen_normativo_verificado, valor: confirmado } }] }
+      - { clave: no_confirmar, etiqueta: No confirmado, a: registrar-origen, requiere_justificacion: true, acciones: [{ marcar: { marca: origen_normativo_verificado, valor: no_confirmado } }, { marcar: { marca: origen_normativo, valor: no_aplica } }] }
+
+  - id: registrar-origen
+    tipo: tarea
+    nombre: Registrar origen normativo y marca de obligación externa
+    responsable: { rol: pm_demanda }
+    instrumentos: [{ clave: ficha-demanda, seccion: B, modo: emitir }]
+    acciones_usuario:
+      - { clave: confirmar, etiqueta: Confirmar clasificación, a: ruta }
+
+  - id: ruta
+    tipo: decision
+    nombre: "¿Grupo y entrada directa?"
+    reglas:
+      - si: { "==": [{ var: clasificacion.grupo }, requerimientos] }
+        a: a-requerimientos
+      - si:
+          and:
+            - { "==": [{ var: clasificacion.grupo }, proyectos] }
+            - or:
+                - { "==": [{ var: registros.ficha-demanda.B.entrada_directa }, presupuesto_plan_anual] }
+                - { "==": [{ var: registros.ficha-demanda.B.entrada_directa }, mandato_directorio] }
+                - and:
+                    - { "==": [{ var: registros.ficha-demanda.B.entrada_directa }, mandato_regulatorio] }
+                    - { "==": [{ var: demanda.marcas.origen_normativo_verificado }, confirmado] }
+        a: a-proyectos
+    por_defecto: a-preproyecto
+
+  - id: a-requerimientos
+    tipo: traspaso
+    flujo: m1-requerimientos
+    acciones:
+      - cambiar_estado: { valor: planificacion }
+      - fijar_fecha: { campo: fecha_clasificacion, valor: hoy }
+      - cambiar_tramo: { valor: analisis }
+      - notificar: { plantilla: demanda-clasificada, a: [{ rol_demanda: solicitante }, { rol_demanda: dueno_funcional }] }
+
+  - id: a-preproyecto
+    tipo: traspaso
+    flujo: m1-requerimientos
+    acciones:
+      - cambiar_grupo_categoria: { etapa: pre_proyecto }
+      - asignar_identificador: { tipo: pre_proyecto }
+      - cambiar_estado: { valor: planificacion }
+      - fijar_fecha: { campo: fecha_clasificacion, valor: hoy }
+      - cambiar_tramo: { valor: analisis }
+      - notificar: { plantilla: demanda-clasificada, a: [{ rol_demanda: solicitante }, { rol_demanda: dueno_funcional }] }
+
+  - id: a-proyectos
+    tipo: traspaso
+    flujo: m2-proyectos
+    acciones:
+      - cambiar_grupo_categoria: { etapa: proyecto_entrada_directa }
+      - cambiar_estado: { valor: planificacion }
+      - fijar_fecha: { campo: fecha_clasificacion, valor: hoy }
+      - cambiar_tramo: { valor: analisis }
+      - notificar: { plantilla: demanda-clasificada, a: [{ rol_demanda: solicitante }, { rol_demanda: dueno_funcional }] }
+
+  - { id: cancelada, tipo: fin, resultado: cancelado }
+  - id: cerrada-duplicado
+    tipo: fin
+    resultado: cancelado
+    acciones: [{ cambiar_estado: { valor: cancelado } }, { vincular: { tipo: duplicado_de, desde: registros.ficha-demanda.B.duplicado_de } }]

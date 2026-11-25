@@ -1,0 +1,20 @@
+# Ejemplo. Cada empresa carga su plan estratégico real (Administración › Estrategia).
+directrices:
+  - clave: D1
+    nombre: Liderazgo en banca digital
+    objetivos:
+      - { clave: D1-O1, nombre: Aumentar la adopción de canales digitales, vigencia: { desde: 2026-01-01, hasta: 2028-12-31 } }
+      - { clave: D1-O2, nombre: Confianza y seguridad digital, vigencia: { desde: 2026-01-01, hasta: 2028-12-31 } }
+  - clave: D2
+    nombre: Excelencia operativa
+    objetivos:
+      - { clave: D2-O1, nombre: Reducir el costo por transacción, vigencia: { desde: 2026-01-01, hasta: 2028-12-31 } }
+  - clave: D3
+    nombre: Cumplimiento y gestión de riesgos
+    objetivos:
+      - { clave: D3-O1, nombre: Cero observaciones regulatorias abiertas fuera de plazo, vigencia: { desde: 2026-01-01, hasta: 2028-12-31 } }
+  - clave: D4
+    nombre: Crecimiento en segmentos
+    objetivos:
+      - { clave: D4-O1, nombre: Crecer en pymes, vigencia: { desde: 2026-01-01, hasta: 2028-12-31 } }
+okr_areas: []   # se cargan por área y año

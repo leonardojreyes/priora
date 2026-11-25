@@ -1,0 +1,236 @@
+# Marco 1: requerimientos (BAU) y pre-proyectos (marco §5; BPMN docs/referencia/img/bpmn-marco1-requerimientos.png)
+clave: m1-requerimientos
+nombre: Gestión de requerimientos y pre-proyectos
+version: 1
+contexto_inicial: { tramo: analisis }
+inicio: definir-requisitos
+
+nodos:
+  # ── Fase 1 · Análisis y estimación ─────────────────────────────────────────────
+  - id: definir-requisitos
+    tipo: tarea
+    nombre: Definir requisitos funcionales
+    responsable: { rol_demanda: dueno_funcional }
+    instrumentos:
+      - { clave: historia-usuario, modo: editar, obligatorio: true, si: { "!=": [{ var: demanda.etapa }, pre_proyecto] } }
+      - { clave: ficha-preproyecto, seccion: A, modo: editar, obligatorio: true, si: { "==": [{ var: demanda.etapa }, pre_proyecto] } }
+    preguntas:   # se guardan en vars.* del flujo
+      - { clave: requiere_proveedor, tipo: si_no, etiqueta: "¿Se requiere un proveedor para atenderla?", obligatorio: true }
+    acciones_usuario: [{ clave: completar, etiqueta: Requisitos definidos, a: recursos }]
+
+  - id: recursos
+    tipo: inclusivo
+    nombre: "¿Requiere proveedor?"
+    ramas:
+      - { a: gestionar-recursos }                                                     # siempre
+      - { a: cotizar, si: { "==": [{ var: vars.requiere_proveedor }, true] } }
+
+  - id: gestionar-recursos
+    tipo: tarea
+    nombre: Gestionar recursos de las áreas involucradas
+    responsable: { rol_demanda: dueno_funcional }
+    acciones_usuario: [{ clave: completar, etiqueta: Recursos gestionados, a: union-recursos }]
+
+  - id: cotizar
+    tipo: tarea
+    nombre: Generar cotizaciones con NDA firmado
+    responsable: { area: administracion, rol: comprador }
+    instrumentos: [{ clave: ficha-proveedor, seccion: cotizacion, modo: editar }]
+    condicion_completar: { "!!": [{ var: registros.ficha-proveedor.nda_adjunto }] }
+    acciones_usuario: [{ clave: completar, etiqueta: Cotizaciones listas, a: union-recursos }]
+
+  - { id: union-recursos, tipo: union_inclusiva, espera: [gestionar-recursos, cotizar], salidas: [{ a: analizar }] }
+
+  - id: analizar
+    tipo: tarea
+    nombre: Analizar alcance, beneficio y costo; pre-priorizar
+    responsable: { rol: pm_demanda }
+    colaboradores: [{ rol_demanda: analista_asignado }]
+    instrumentos:
+      - { clave: ficha-demanda, seccion: C, modo: emitir }
+      - { evaluacion: modelo-requerimientos, si: { "!=": [{ var: demanda.etapa }, pre_proyecto] } }
+      - { evaluacion: modelo-proyectos, si: { "==": [{ var: demanda.etapa }, pre_proyecto] } }
+    acciones_usuario: [{ clave: completar, etiqueta: Listo para la sesión, a: privacidad }]
+
+  - id: privacidad
+    tipo: decision
+    nombre: "¿Activa evaluación de privacidad?"
+    reglas:
+      - { si: { "==": [{ var: registros.ficha-demanda.C.datos_personales }, activa_evaluacion] }, a: evaluar-privacidad }
+    por_defecto: priorizar
+
+  - id: evaluar-privacidad
+    tipo: tarea
+    nombre: Evaluación de impacto en datos y privacidad
+    responsable: { area: seguridad-informacion }
+    colaboradores: [{ rol: oficial_datos }]
+    instrumentos: [{ clave: evaluacion-privacidad, modo: emitir }]
+    acciones_usuario: [{ clave: completar, etiqueta: Evaluación emitida, a: priorizar }]
+
+  # ── Fase 2 · Priorización ─────────────────────────────────────────────────────
+  - id: priorizar
+    tipo: sesion
+    nombre: Priorizar en la Mesa de Demanda
+    instancia: mesa-demanda
+    motivo: { si: { "==": [{ var: demanda.etapa }, pre_proyecto] }, entonces: validar, sino: priorizar }
+    al_entrar: [{ cambiar_tramo: { valor: priorizacion } }]
+    requisitos:
+      - { evaluacion_vigente: true }
+      - { capacidad_completa: true, excepto_si: { tiene_marca: [obligacion_externa, [regulatoria, franquicia]] } }
+      - { sin_bloqueo_privacidad: true }       # pronunciamiento del oficial en supuestos de mayor exposición
+    revision_previa:
+      instancia: revision-ejecutiva
+      si_desfavorable: { a: devuelta-por-revision }
+    decisiones:
+      - clave: prioritario
+        si: { "!=": [{ var: demanda.etapa }, pre_proyecto] }
+        a: inicio-programado
+        acciones: [{ fijar_fecha: { campo: fecha_decision, valor: hoy } }]
+      - clave: validar_elevar
+        si: { "==": [{ var: demanda.etapa }, pre_proyecto] }
+        a: a-proyectos
+        acciones: [{ fijar_fecha: { campo: fecha_decision, valor: hoy } }]
+      - clave: diferir
+        a: priorizar
+        si: { "!": [{ var: demanda.diferimiento.ultima_reevaluacion }] }
+        acciones: [{ iniciar_diferimiento: { desde_instancia: true } }, { cambiar_tramo: { valor: diferido } }]
+      - clave: reclasificar
+        a: analizar          # vuelve a evaluarse con el modelo de su nuevo grupo (marco §5.5.3)
+        requiere_justificacion: true
+        acciones: [{ cambiar_grupo_categoria: { desde: decision } }, { cambiar_tramo: { valor: analisis } }]
+      - clave: rechazar
+        a: rechazada
+        requiere_justificacion: true
+      - clave: fusionar
+        a: fusionada
+        requiere_justificacion: true
+        acciones: [{ vincular: { tipo: fusionada_en, desde: decision.demanda_destino } }]
+      - clave: dar_plazo
+        a: priorizar
+        si: { "==": [{ var: demanda.etapa }, pre_proyecto] }
+        maximo: 1
+
+  - id: devuelta-por-revision
+    tipo: fin
+    resultado: devuelto
+    acciones:
+      - cambiar_estado: { valor: cancelado }
+      - notificar: { plantilla: devuelta-por-revision-ejecutiva, a: [{ rol_demanda: solicitante }] }
+
+  - id: rechazada
+    tipo: fin
+    resultado: rechazado
+    acciones:
+      - cambiar_estado: { valor: cancelado }
+      - notificar: { plantilla: demanda-rechazada, a: [{ rol_demanda: solicitante }, { rol_demanda: dueno_funcional }] }
+
+  - id: fusionada
+    tipo: fin
+    resultado: cancelado
+    acciones:
+      - cambiar_estado: { valor: cancelado }
+      - notificar: { plantilla: demanda-fusionada, a: [{ rol_demanda: solicitante }] }
+
+  - id: a-proyectos
+    tipo: traspaso
+    nombre: Elevar a Marco 2 como proyecto propuesto
+    flujo: m2-proyectos
+    acciones:
+      - cambiar_grupo_categoria: { etapa: proyecto_propuesto }
+      - notificar: { plantilla: preproyecto-validado, a: [{ rol_demanda: solicitante }, { rol_demanda: sponsor }] }
+
+  # ── Fase 3 · Inicio y planificación ───────────────────────────────────────────
+  - id: inicio-programado
+    tipo: decision
+    nombre: "¿Capacidad inmediata?"
+    reglas:
+      - { si: { "!!": [{ var: decision.fecha_inicio_programado }] }, a: esperar-inicio }
+    por_defecto: iniciar-planificar
+
+  - id: esperar-inicio
+    tipo: temporizador
+    nombre: Aprobado con inicio programado
+    al_entrar: [{ cambiar_tramo: { valor: espera_capacidad } }, { fijar_fecha: { campo: fecha_inicio_programado, desde: decision.fecha_inicio_programado } }]
+    hasta: { var: demanda.fecha_inicio_programado }
+    recordatorio_previo: { dias_calendario: 7, crear_tarea: { nombre: Confirmar capacidad para el inicio, responsable: { rol: pm_demanda } } }
+    salidas: [{ a: iniciar-planificar }]
+
+  - id: iniciar-planificar
+    tipo: tarea
+    nombre: "Iniciar y planificar: responsable asignado, fecha objetivo y plan"
+    responsable: { rol: pm_demanda }
+    al_entrar: [{ cambiar_tramo: { valor: ejecucion } }]
+    preguntas:
+      - { clave: responsable_asignado, tipo: usuario, etiqueta: Responsable asignado (lo designa el área ejecutora), obligatorio: true }
+      - { clave: fecha_objetivo, tipo: fecha, etiqueta: Fecha objetivo / SLA, obligatorio: true }
+    acciones_usuario:
+      - clave: completar
+        etiqueta: Planificado
+        a: contratar
+        acciones:
+          - asignar_rol_demanda: { rol: responsable_asignado, desde: vars.responsable_asignado }
+          - traspasar_seguimiento: { a: { rol_demanda: responsable_asignado } }
+          - fijar_fecha: { campo: fecha_linea_base, desde: vars.fecha_objetivo }
+          - fijar_fecha: { campo: fecha_vigente, desde: vars.fecha_objetivo }
+          - fijar_fecha: { campo: fecha_inicio, valor: hoy }
+
+  - id: contratar
+    tipo: decision
+    nombre: "¿Contratar proveedor?"
+    reglas:
+      - { si: { "==": [{ var: vars.requiere_proveedor }, true] }, a: seleccionar-contratar }
+    por_defecto: construir
+
+  - id: seleccionar-contratar
+    tipo: tarea
+    nombre: Seleccionar y contratar
+    responsable: { area: administracion, rol: comprador }
+    instrumentos: [{ clave: ficha-proveedor, seccion: contratacion, modo: emitir }]
+    acciones_usuario: [{ clave: completar, etiqueta: Contratado, a: construir }]
+
+  # ── Fase 4 · Ejecución y entrega ──────────────────────────────────────────────
+  - id: construir
+    tipo: subflujo
+    nombre: Atender y construir (etapas 1 y 2)
+    flujo: sub-construir
+    al_entrar: [{ cambiar_estado: { valor: en_ejecucion } }]
+    salidas:
+      - { a: validar-entrega, si: { en_categoria_con_flag: sin_pase_produccion } }
+      - { a: desplegar }
+
+  - id: desplegar
+    tipo: subflujo
+    nombre: Desplegar y validar (etapas 3 y 4)
+    flujo: sub-certificar-implementar
+    salidas: [{ a: validar-satisfaccion }]
+
+  - id: validar-entrega
+    tipo: tarea
+    nombre: Validar la entrega con el área solicitante
+    responsable: { rol_demanda: dueno_funcional }
+    acciones_usuario: [{ clave: conforme, etiqueta: Conforme, a: verificar-cierre }]
+
+  # ── Fase 5 · Cierre ───────────────────────────────────────────────────────────
+  - id: validar-satisfaccion
+    tipo: tarea
+    nombre: Validar la satisfacción
+    responsable: { rol_demanda: solicitante }
+    instrumentos: [{ clave: cierre-operativo, seccion: satisfaccion, modo: editar }]
+    acciones_usuario: [{ clave: completar, etiqueta: Validado, a: verificar-cierre }]
+
+  - id: verificar-cierre
+    tipo: tarea
+    nombre: Verificar evidencia y registrar el cierre
+    responsable: { area: gestion-procesos }
+    al_entrar: [{ cambiar_tramo: { valor: cierre } }]
+    instrumentos: [{ clave: cierre-operativo, modo: emitir }]
+    condicion_completar: { expediente_completo: true }
+    acciones_usuario: [{ clave: cerrar, etiqueta: Cerrar, a: cerrada }]
+
+  - id: cerrada
+    tipo: fin
+    resultado: completado
+    acciones:
+      - cambiar_estado: { valor: finalizado }
+      - fijar_fecha: { campo: fecha_cierre, valor: hoy }
+      - notificar: { plantilla: demanda-cerrada, a: [{ rol_demanda: solicitante }] }

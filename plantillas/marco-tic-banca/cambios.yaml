@@ -1,0 +1,15 @@
+# Umbrales de control de cambios (marco §5.4 y §6.6.1)
+requerimientos:
+  identificador: cambio_demanda
+  magnitudes:
+    - { clave: menor, criterio: "No altera la fecha objetivo ni el esfuerzo más allá de su holgura", aprueba: [{ rol_demanda: analista_asignado }, { rol_demanda: dueno_funcional }], requiere_identificador: false }
+    - { clave: moderado, criterio: "Mueve la fecha objetivo o sube el esfuerzo sin cambiar el grupo", aprueba: [{ instancia: mesa-demanda }], actualiza: fecha_vigente }
+    - { clave: cambia_grupo, criterio: "Con el nuevo alcance el árbol da proyecto", accion: volver_a_triage }
+  cambio_categoria_mismo_grupo: { aprueba: [{ rol: pm_demanda }], requiere_razon: true }
+proyectos:
+  identificador: cambio_proyecto
+  magnitudes:
+    - { clave: menor, criterio: "No altera hito, presupuesto ni alcance comprometido", aprueba: [{ rol_demanda: pm_proyecto }] }
+    - { clave: moderado, criterio: "Afecta un hito, el presupuesto hasta el rango o agrega alcance acotado", aprueba: [{ rol_demanda: sponsor }, { rol_demanda: pm_proyecto }], rango_presupuesto_pct: null }
+    - { clave: mayor, criterio: "Cambia la fecha final, supera el rango, altera el alcance central o el caso de negocio", aprueba: [{ instancia: comision-proyectos }], requiere: presentacion_sponsor }
+    - { clave: contrato_proveedor, criterio: "Modifica el alcance comprometido con un tercero", aprueba: [{ area: administracion }, { instancia: comision-proyectos }] }

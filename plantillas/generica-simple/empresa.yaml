@@ -1,0 +1,8 @@
+zona_horaria: America/Guayaquil
+idioma: es-EC
+moneda: USD
+calendario: { dias_habiles: [lun, mar, mie, jue, vie], feriados: [] }
+identificadores:
+  demanda: "SOL-{AAAA}-{N:5}"
+modulos: [entrada, priorizacion, indicadores]
+umbrales: {}

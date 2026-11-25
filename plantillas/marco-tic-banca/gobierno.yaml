@@ -1,0 +1,100 @@
+# Instancias de gobierno. tipo: operativa | colegiada | revision_ejecutiva
+instancias:
+  - clave: mesa-triage
+    nombre: Mesa de triage
+    tipo: operativa
+    frecuencia: "Diaria o 2-3 veces por semana"
+    preside: { rol: pm_demanda }
+    miembros:
+      - { rol: pm_demanda, participa: voto }
+      - { rol: representante_mesa_servicio, participa: voto }
+      - { rol: tecnico_referencia, participa: consultivo }
+    invitados_por_disparador:
+      - { si: impacto_proceso, area: gestion-procesos }
+      - { si: datos_o_seguridad, area: seguridad-informacion }
+      - { si: origen_normativo, area: cumplimiento }
+      - { si: componente_legal, area: legal }
+      - { si: afecta_personal, area: talento-humano }
+    quorum: { todos: [{ rol: pm_demanda }, { rol: representante_mesa_servicio }] }
+    exige_capacidad: false
+    decisiones: [clasificar, devolver, marcar_duplicado]
+    acta: solo_si_escalamiento
+
+  - clave: mesa-demanda
+    nombre: Mesa de Demanda
+    tipo: colegiada
+    frecuencia: "Semanal (dos por semana en alto volumen)"
+    preside: { rol: pmo, delegable_a: { rol: pm_demanda } }
+    secretaria: { rol: pm_demanda }
+    miembros:
+      - { rol: pmo, participa: voto }
+      - { rol: pm_demanda, participa: voto }
+      - { rol: cio, participa: voto }
+      - { lideres_areas_solicitantes_en_agenda: true, participa: voto }
+      - { area: gestion-procesos, participa: consultivo }
+      - { area: cumplimiento, participa: consultivo }
+      - { area: arquitectura, participa: consultivo }
+    quorum:
+      todos:
+        - { rol: pmo, o_delegado: true }
+        - { rol: cio, o_delegado: true }
+        - { al_menos: 1, de: lideres_areas_solicitantes_en_agenda }
+    exige_capacidad: true
+    modelo_requerimientos: modelo-requerimientos
+    modelo_pre_proyectos: modelo-proyectos
+    decisiones: [prioritario, diferir, rechazar, reclasificar, validar_elevar, fusionar, elevar_conflicto, aprobar_cambio, rechazar_cambio, dar_plazo, tomar_conocimiento]
+    diferido: { cadencia_dias_calendario: 15, maximo_reevaluaciones: 2 }
+    inicio_programado: { tope_dias_calendario: 30, verificacion_previa_dias: 7 }
+    aprueba_presupuesto_proveedor:
+      tope: null              # "valor por definir" en el marco: la empresa lo fija
+      condicion: contrato_vigente
+    acta: siempre
+
+  - clave: comision-proyectos
+    nombre: Comisión de proyectos
+    tipo: colegiada
+    frecuencia: "Quincenal o mensual; extraordinaria para cambios mayores"
+    preside: { rol: pmo, alternativa: { area: transformacion } }
+    secretaria: { rol: pm_demanda }
+    miembros:
+      - { rol: pmo, participa: voto }
+      - { rol: cio, participa: voto }
+      - { rol: pm_demanda, participa: voto }
+      - { rol_demanda: sponsor, de_items_en_agenda: true, participa: voto }
+      - { rol_demanda: pm_proyecto, de_items_en_agenda: true, participa: voz }
+      - { area: planificacion-estrategica, participa: voto }
+      - { area: gestion-procesos, participa: consultivo }
+      - { area: seguridad-informacion, participa: consultivo }
+      - { area: cumplimiento, participa: consultivo }
+      - { area: financiera, participa: consultivo, si: agenda_con_inversion_o_beneficios }
+    quorum:
+      todos:
+        - { quien_preside: true }
+        - { rol: cio }
+        - { rol_demanda: sponsor, del_item: true }
+        - { rol: pmo, o_delegado: true }
+    exige_capacidad: true
+    modelo_proyectos: modelo-proyectos
+    decisiones: [prioritario, diferir, rechazar, dar_plazo, aprobar_cambio, rechazar_cambio, elevar_conflicto, tomar_conocimiento, cancelar_proyecto]
+    diferido: { cadencia_meses: 1, maximo_reevaluaciones: 2 }
+    inicio_programado: { tope_meses: 3, verificacion_previa_dias: 30 }
+    recibe_cartera_regulatoria: true
+    acta: siempre
+
+  - clave: revision-ejecutiva
+    nombre: Revisión de la Vicepresidencia Ejecutiva
+    tipo: revision_ejecutiva
+    revisor: { rol: revisor_ejecutivo }
+    revisa_antes_de: [mesa-demanda, comision-proyectos]
+    opcional: true
+    vinculante: true
+    ventana: hasta_sesion
+    resultados: [favorable, favorable_con_condiciones, desfavorable]
+    silencio: continua
+    repetir_solo_si: cambio_material
+
+# Quién decide un conflicto de capacidad (marco §7.5)
+conflictos_capacidad:
+  - { suspende: requerimientos, compite_con: requerimientos, decide: mesa-demanda, metodo: modelo_propio }
+  - { suspende: requerimientos, compite_con: proyectos, decide: comision-proyectos, ejecuta: mesa-demanda, metodo: nucleo_comun }
+  - { suspende: proyectos, compite_con: cualquiera, decide: comision-proyectos, metodo: segun_grupos }

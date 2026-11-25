@@ -1,0 +1,4 @@
+unidad: horas_persona
+horizonte_meses: 1
+areas_obligatorias: []
+regla_estricta: { activa: false }

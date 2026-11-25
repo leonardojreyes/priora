@@ -1,0 +1,39 @@
+# Árbol requerimiento o proyecto (marco §4.4, Figura 4). Prevalencia fija: filtro → determinantes → factores.
+clave: arbol-requerimiento-proyecto
+version: 1
+filtro:
+  pregunta: "¿La necesidad está bien definida?"
+  ayuda: "Problema, objetivo, alcance, reglas, datos, excepciones y criterios de aceptación."
+  si_no: devolver
+determinantes:   # basta un sí para que sea proyecto
+  - clave: p2
+    texto: "¿Requiere una contratación nueva y específica o una inversión que se aprueba con acta?"
+    ayuda: "Un proveedor con contrato vigente no cuenta aquí: suma como factor 5."
+  - clave: p3
+    texto: "¿Requiere una nueva plataforma o una migración tecnológica?"
+    ayuda: "Reemplazar un sistema o cambiar su tecnología base."
+  - clave: p4
+    texto: "¿Requiere un cambio estructural del modelo de datos?"
+    ayuda: "Rediseño del modelo, migración de datos, nuevas fuentes o cambios masivos. Campos o tablas puntuales no cuentan: suman como factor 7."
+factores:        # solo si p2, p3 y p4 son no; se cuentan elementos distintos, no personas ni pantallas
+  - { clave: f1, texto: "Tres o más áreas involucradas" }
+  - { clave: f2, texto: "Tres o más sistemas o integraciones" }
+  - { clave: f3, texto: "Tres o más entregables o casos de uso" }
+  - { clave: f4, texto: "Servicio de terceros ya contratado (RPA, BPM, IA, OCR, API o SaaS) que hay que integrar o configurar" }
+  - { clave: f5, texto: "Proveedor con contrato vigente" }
+  - { clave: f6, texto: "Datos sensibles o confidenciales" }
+  - { clave: f7, texto: "Cambios puntuales en bases de datos" }
+  - { clave: f8, texto: "Despliegue por fases" }
+  - { clave: f9, texto: "Nuevo modelo de soporte u operación" }
+  - clave: f10
+    texto: "Esfuerzo mayor a 20 días-persona o duración mayor a 4 semanas"
+    automatico: { or: [{ ">": [{ var: datos.esfuerzo_dias_persona }, 20] }, { ">": [{ var: datos.duracion_semanas }, 4] }] }
+umbral_factores: 3
+entrada_directa:
+  - { clave: presupuesto_plan_anual, texto: "Presupuesto asignado en el plan anual de inversiones" }
+  - { clave: mandato_regulatorio, texto: "Mandato regulatorio verificado por Cumplimiento", requiere: { marca: origen_normativo_verificado, valor: confirmado } }
+  - { clave: mandato_directorio, texto: "Mandato del Directorio", requiere_referencia: true }
+resultado:
+  requerimiento: { grupo: requerimientos }
+  proyecto_con_entrada_directa: { grupo: proyectos, etapa: proyecto_entrada_directa }
+  proyecto_sin_entrada_directa: { grupo: proyectos, etapa: pre_proyecto }

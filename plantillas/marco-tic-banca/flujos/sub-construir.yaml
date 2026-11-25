@@ -1,0 +1,58 @@
+# Subproceso común: etapas 1 (definiciones) y 2 (desarrollo) del marco §5.7.
+# Marco 1 lo llama "Atender y construir"; Marco 2, "Construir y asegurar calidad".
+clave: sub-construir
+nombre: Definir y construir
+version: 1
+inicio: tipo-definicion
+
+nodos:
+  - id: tipo-definicion
+    tipo: decision
+    nombre: "¿Ajuste puntual o definición completa?"
+    reglas:
+      # Solicitud de información y POC: solo el núcleo de la historia (aplicación proporcional)
+      - { si: { en_categoria_con_flag: sin_pase_produccion }, a: definir-nucleo }
+      - { si: { "==": [{ var: demanda.grupo }, proyectos] }, a: levantar-definiciones }
+    por_defecto: elegir-definicion
+
+  - id: elegir-definicion
+    tipo: decision_humana
+    nombre: "¿Modifica una regla de negocio o un proceso?"
+    responsable: { area: gestion-procesos }
+    opciones:
+      - { clave: si, etiqueta: Sí, documento de definiciones, a: levantar-definiciones }
+      - { clave: no, etiqueta: No, basta el núcleo de la historia, a: definir-nucleo }
+
+  - id: levantar-definiciones
+    tipo: tarea
+    nombre: Levantamiento de definiciones
+    responsable: { area: gestion-procesos }
+    colaboradores: [{ rol_demanda: analista_asignado }]
+    instrumentos: [{ clave: definiciones, modo: editar }]
+    acciones_usuario: [{ clave: completar, etiqueta: Definiciones listas, a: aprobar-definiciones }]
+
+  - id: definir-nucleo
+    tipo: tarea
+    nombre: Completar el núcleo de la historia de usuario
+    responsable: { rol_demanda: analista_asignado }
+    instrumentos: [{ clave: historia-usuario, seccion: nucleo, modo: emitir }]
+    acciones_usuario: [{ clave: completar, etiqueta: Núcleo completo, a: aprobar-definiciones }]
+
+  - id: aprobar-definiciones
+    tipo: tarea
+    nombre: Aprobar definiciones
+    responsable: { rol_demanda: dueno_funcional }
+    instrumentos:
+      - { clave: definiciones, modo: firmar, si: { "!!": [{ var: registros.definiciones }] } }
+      - { clave: historia-usuario, modo: firmar, si: { "!": [{ var: registros.definiciones }] } }
+    acciones_usuario:
+      - { clave: aprobar, etiqueta: Aprobar, a: desarrollar }
+      - { clave: observar, etiqueta: Observar, a: tipo-definicion, requiere_justificacion: true }
+
+  - id: desarrollar
+    tipo: tarea
+    nombre: Desarrollo, parametrización o adquisición
+    responsable: { rol_demanda: responsable_asignado, alternativa: { rol_demanda: pm_proyecto } }
+    acciones_usuario: [{ clave: completar, etiqueta: Listo para certificar, a: fin }]
+
+  - { id: fin, tipo: fin, resultado: completado }

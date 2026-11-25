@@ -1,0 +1,13 @@
+unidad: horas_persona
+horizonte_meses: 3
+areas_obligatorias: [tecnologia, gestion-procesos, seguridad-informacion, riesgos]
+areas_informativas:
+  - { area: administracion, reporta: disponibilidad_proveedores, frecuencia: mensual }
+  - { area: financiera, reporta: presupuesto_disponible, frecuencia: mensual }
+  - { area: legal, reporta: tiempos_revision, frecuencia: cuando_hay_disparador }
+regla_estricta:
+  activa: true
+  excepcion: fecha_externa_no_negociable
+  postergaciones_maximas: 1
+solicitar_reporte: { dias_habiles_antes_de_sesion: 2 }
+saturacion_estructural: { meses_consecutivos: 3, escalar_a: comision-proyectos }

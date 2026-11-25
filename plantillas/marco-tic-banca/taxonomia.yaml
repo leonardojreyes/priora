@@ -1,0 +1,97 @@
+grupos:
+  - { clave: requerimientos, nombre: Requerimientos (BAU), flujo: m1-requerimientos, instancia: mesa-demanda }
+  - { clave: proyectos, nombre: Proyectos, flujo: m2-proyectos, instancia: comision-proyectos }
+
+categorias:
+  - clave: cumplimiento-normativo
+    grupo: requerimientos
+    nombre: Cumplimiento normativo
+    flags: { requiere_verificacion_origen: true, fecha_externa_no_negociable: si_tiene_fecha, entra_cartera_regulatoria: true, relacion_historia: "1:N" }
+    instrumentos_minimos: [ficha-demanda, hoja-priorizacion, historia-usuario, "plan-transicion?", cierre-operativo, "adjunto:documento-origen"]
+  - clave: evolutivo
+    grupo: requerimientos
+    nombre: Evolutivo
+    flags: { relacion_historia: "1:N" }
+    instrumentos_minimos: [ficha-demanda, hoja-priorizacion, historia-usuario, "plan-transicion?", cierre-operativo, "definiciones?"]
+  - clave: solicitud-informacion
+    grupo: requerimientos
+    nombre: Solicitud de información
+    flags: { sin_pase_produccion: true, relacion_historia: "1:1" }
+    instrumentos_minimos: [ficha-demanda, hoja-priorizacion, historia-usuario, cierre-operativo]
+  - clave: mandatos-franquicias
+    grupo: requerimientos
+    nombre: Mandatos de franquicias
+    flags: { fecha_externa_no_negociable: si_tiene_fecha, decide_siempre: mesa-demanda, relacion_historia: "1:N" }
+    instrumentos_minimos: [ficha-demanda, hoja-priorizacion, historia-usuario, "plan-transicion?", cierre-operativo]
+  - clave: poc-estimaciones
+    grupo: requerimientos
+    nombre: POC / Estimaciones
+    flags: { sin_pase_produccion: true, relacion_historia: "1:1", plazo_maximo_dias_habiles: { poc: 30, estimacion: 10 }, prorroga_maxima: 1 }
+    instrumentos_minimos: [ficha-demanda, hoja-priorizacion, historia-usuario, cierre-operativo]
+  - clave: requerimientos-it4it
+    grupo: requerimientos
+    nombre: Requerimientos IT4IT
+    flags: { area_solicitante_restringida: [tecnologia], relacion_historia: "1:N" }
+    instrumentos_minimos: [ficha-demanda, hoja-priorizacion, historia-usuario, "plan-transicion?", cierre-operativo]
+  - clave: proyectos-it4it
+    grupo: proyectos
+    nombre: Proyectos IT4IT
+    flags: { area_solicitante_restringida: [tecnologia], discovery: opcional_salvo_impacto_externo, sponsor_tipico: cio }
+    instrumentos_minimos: &min_proyecto [ficha-demanda, hoja-priorizacion, ficha-preproyecto, costo-retorno, acta-constitucion, matriz-riesgos, informe-estado, definiciones, plan-transicion, seguimiento-beneficios, acta-cierre]
+  - clave: proyecto-estrategico
+    grupo: proyectos
+    nombre: Proyecto Estratégico
+    flags: { discovery: obligatorio, participa_alta_direccion: true }
+    instrumentos_minimos: *min_proyecto
+  - clave: proyecto-operativo
+    grupo: proyectos
+    nombre: Proyecto Operativo
+    flags: { discovery: obligatorio }
+    instrumentos_minimos: *min_proyecto
+# "?" al final = condicional (lo decide la regla del instrumento, p. ej. plan-transicion solo si pasa a producción).
+# "hoja-priorizacion" = evaluación vigente del módulo de priorización; "adjunto:<tipo>" = documento obligatorio en el expediente.
+
+# Regla de precedencia para sugerir categoría (marco §4.3): se evalúa en orden
+precedencia:
+  requerimientos:
+    - { si: { "==": [{ var: datos.origen_normativo_declarado }, true] }, categoria: cumplimiento-normativo }
+    - { si: { "==": [{ var: datos.obligacion_externa }, franquicia] }, categoria: mandatos-franquicias }
+    - { si: { "==": [{ var: demanda.area_solicitante }, tecnologia] }, categoria: requerimientos-it4it }
+    - { si: { "==": [{ var: datos.proposito }, probar_o_estimar] }, categoria: poc-estimaciones }
+    - { si: { "==": [{ var: datos.proposito }, obtener_datos] }, categoria: solicitud-informacion }
+    - { por_defecto: evolutivo }
+  proyectos:
+    - { si: { "==": [{ var: demanda.area_solicitante }, tecnologia] }, categoria: proyectos-it4it }
+    - { si: { "==": [{ var: datos.contribucion_objetivo }, directa_critica] }, categoria: proyecto-estrategico }
+    - { por_defecto: proyecto-operativo }
+
+etapas:
+  - { clave: pre_proyecto, nombre: Pre-proyecto, grupo: proyectos, identificador: pre_proyecto }
+  - { clave: proyecto_propuesto, nombre: Proyecto propuesto, grupo: proyectos }
+  - { clave: proyecto_entrada_directa, nombre: Proyecto de entrada directa, grupo: proyectos }
+  - { clave: proyecto_aprobado, nombre: Proyecto aprobado, grupo: proyectos, identificador: proyecto }
+
+estados:
+  - { clave: planificacion, nombre: Planificación }
+  - { clave: en_ejecucion, nombre: En ejecución }
+  - { clave: en_pruebas, nombre: En pruebas }
+  - { clave: suspendido, nombre: Suspendido, detiene_reloj: true }
+  - { clave: finalizado, nombre: Finalizado, terminal: true }
+  - { clave: cancelado, nombre: Cancelado, terminal: true, sale_de_semaforo: true }
+
+tramos: [triage, analisis, priorizacion, diferido, espera_capacidad, ejecucion, cierre]
+
+marcas:
+  - { clave: obligacion_externa, valores: [regulatoria, franquicia, no_aplica] }
+  - { clave: origen_normativo, valores: [regulador, auditoria_externa, auditoria_interna, no_aplica] }
+  - { clave: origen_normativo_verificado, valores: [confirmado, no_confirmado, pendiente] }
+  - { clave: riesgo_regulatorio_ciber_alto, valores: [true, false] }
+
+catalogos:
+  urgencia: [baja, media, alta, critica]
+  impacto: [clientes, ingresos, costo, riesgo, cumplimiento, eficiencia]
+  beneficio_financiero: [genera_ingreso, genera_ahorro, ninguno]
+  beneficio_no_financiero: [evita_perdida, optimiza_tiempo, evita_multa, otros]
+  datos_personales: [no_trata, tratamiento_ya_evaluado, activa_evaluacion]
+  proposito: [cambiar_sistema, probar_o_estimar, obtener_datos]
+  contribucion_objetivo: [directa_critica, indirecta_parcial, ninguna]

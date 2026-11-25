@@ -1,0 +1,73 @@
+clave: solicitud-ti
+nombre: Solicitud de TI
+version: 1
+dispara: demanda_creada
+contexto_inicial: { tramo: evaluacion }
+inicio: registrar
+nodos:
+  - id: registrar
+    tipo: accion
+    acciones:
+      - asignar_identificador: { tipo: demanda }
+      - emitir_registro: { instrumento: solicitud }
+      - asignar_rol_demanda: { rol: solicitante, desde: creador }
+      - cambiar_estado: { valor: abierta }
+      - fijar_fecha: { campo: fecha_registro, valor: hoy }
+      - notificar: { plantilla: demanda-registrada, a: [{ rol_demanda: solicitante }, { rol: analista_ti }] }
+    salidas: [{ a: evaluar }]
+  - id: evaluar
+    tipo: tarea
+    nombre: Evaluar y clasificar
+    responsable: { rol: analista_ti }
+    instrumentos: [{ evaluacion: modelo-simple }]
+    preguntas:
+      - { clave: categoria, tipo: lista, fuente: categorias, etiqueta: Categoría, obligatorio: true }
+      - { clave: horas_estimadas, tipo: numero, etiqueta: Horas estimadas, obligatorio: true }
+    plazo: { tramo: evaluacion }
+    acciones_usuario:
+      - { clave: completar, etiqueta: Enviar a aprobación, a: aprobar, acciones: [{ cambiar_grupo_categoria: { categoria_desde: vars.categoria } }, { cambiar_tramo: { valor: aprobacion } }] }
+  - id: aprobar
+    tipo: decision_humana
+    nombre: Aprobar la solicitud
+    responsable: { rol: gerente_ti }
+    opciones:
+      - { clave: aprobar, etiqueta: Aprobar, a: asignar }
+      - { clave: descartar, etiqueta: Descartar, a: descartada, requiere_justificacion: true }
+  - id: asignar
+    tipo: tarea
+    nombre: Asignar responsable y fecha
+    responsable: { rol: gerente_ti }
+    preguntas:
+      - { clave: responsable, tipo: usuario, etiqueta: Responsable, obligatorio: true }
+      - { clave: fecha_objetivo, tipo: fecha, etiqueta: Fecha comprometida, obligatorio: true }
+    acciones_usuario:
+      - clave: completar
+        etiqueta: Asignar
+        a: ejecutar
+        acciones:
+          - asignar_rol_demanda: { rol: responsable_asignado, desde: vars.responsable }
+          - fijar_fecha: { campo: fecha_linea_base, desde: vars.fecha_objetivo }
+          - fijar_fecha: { campo: fecha_vigente, desde: vars.fecha_objetivo }
+          - cambiar_estado: { valor: en_curso }
+          - cambiar_tramo: { valor: ejecucion }
+  - id: ejecutar
+    tipo: tarea
+    nombre: Ejecutar
+    responsable: { rol_demanda: responsable_asignado }
+    acciones_usuario: [{ clave: completar, etiqueta: Terminado, a: confirmar }]
+  - id: confirmar
+    tipo: tarea
+    nombre: Confirmar la entrega
+    responsable: { rol_demanda: solicitante }
+    plazo: { dias_habiles: 5, al_vencer: [{ mover: { a: terminada } }] }
+    acciones_usuario:
+      - { clave: conforme, etiqueta: Conforme, a: terminada }
+      - { clave: no_conforme, etiqueta: No conforme, a: ejecutar, requiere_justificacion: true }
+  - id: terminada
+    tipo: fin
+    resultado: completado
+    acciones: [{ cambiar_estado: { valor: terminada } }, { fijar_fecha: { campo: fecha_cierre, valor: hoy } }]
+  - id: descartada
+    tipo: fin
+    resultado: rechazado
+    acciones: [{ cambiar_estado: { valor: descartada } }, { notificar: { plantilla: demanda-rechazada, a: [{ rol_demanda: solicitante }] } }]

@@ -1,0 +1,10 @@
+# Plantilla mínima: empresa mediana sin comités formales. Demuestra que nada está cableado al marco bancario.
+clave: generica-simple
+nombre: Solicitudes de TI (simple)
+version: 1.0.0
+idioma: es-EC
+descripcion: >
+  Un solo flujo: registro, evaluación por el analista de TI, aprobación del gerente de TI,
+  ejecución y cierre. Sin árbol de clasificación, sin sesiones, sin revisión ejecutiva y
+  sin regla estricta de capacidad.
+archivos: [empresa.yaml, organizacion.yaml, gobierno.yaml, taxonomia.yaml, priorizacion.yaml, capacidad.yaml, plazos.yaml, instrumentos/solicitud.yaml, flujos/solicitud-ti.yaml]

@@ -1,0 +1,81 @@
+# Ficha única de demanda y triage (marco §9.1). Definición completa de referencia para el resto de instrumentos.
+clave: ficha-demanda
+nombre: Ficha única de demanda y triage
+codigo_visible: "9.1"
+version: 1
+emision: por_seccion
+secciones:
+  - clave: A
+    titulo: La completa el área solicitante al ingresar la necesidad
+    editable_por: [{ rol_demanda: solicitante }]
+    campos:
+      - { clave: titulo, tipo: texto, etiqueta: Título de la demanda, obligatorio: true, max: 150, nucleo: titulo }
+      - { clave: area_solicitante, tipo: area, etiqueta: Área solicitante, obligatorio: true, filtro_area_tipo: solicitante, nucleo: area_solicitante }
+      - { clave: unidad, tipo: area, etiqueta: Departamento o sección, obligatorio: false, hijo_de: area_solicitante, nucleo: unidad_solicitante }
+      - { clave: dueno_funcional, tipo: usuario, etiqueta: Dueño funcional, obligatorio: true, ayuda: "Responde por el alcance funcional y por la aceptación de la entrega.", asigna_rol_demanda: dueno_funcional }
+      - { clave: delegado_funcional, tipo: usuario, etiqueta: Delegado funcional, obligatorio: false, ayuda: "Actúa en ausencia del dueño funcional; no sustituye su responsabilidad.", asigna_rol_demanda: delegado_funcional }
+      - { clave: antecedentes, tipo: texto_largo, etiqueta: Antecedentes, obligatorio: false, ayuda: "Intentos previos, decisiones tomadas, hallazgos de auditoría o compromisos asumidos." }
+      - { clave: alcance, tipo: texto_largo, etiqueta: Alcance de la iniciativa, obligatorio: true, max: 1500, ayuda: "Qué comprende y qué queda fuera, en pocas líneas." }
+      - { clave: problema, tipo: texto_largo, etiqueta: Descripción del problema u oportunidad, obligatorio: true, ayuda: "Con sus palabras; no hace falta lenguaje técnico." }
+      - { clave: proceso_aplicacion, tipo: texto, etiqueta: Proceso, servicio o aplicación afectada, obligatorio: true }
+      - { clave: areas_involucradas, tipo: lista_multiple, fuente: areas, etiqueta: Áreas involucradas, obligatorio: false }
+      - { clave: urgencia, tipo: lista, catalogo: urgencia, etiqueta: Urgencia, obligatorio: true, nucleo: urgencia_declarada }
+      - { clave: fecha_requerida, tipo: fecha, etiqueta: Fecha requerida, obligatorio: false }
+      - { clave: justificacion_fecha, tipo: texto_largo, etiqueta: Justificación de la fecha, obligatorio_si: { "!!": [{ var: datos.fecha_requerida }] }, ayuda: "Si responde a una obligación normativa, indique la norma." }
+      - { clave: origen_normativo_declarado, tipo: si_no, etiqueta: "¿Responde a una norma, auditoría, ente de control o franquicia?", obligatorio: true }
+      - { clave: obligacion_declarada, tipo: texto_largo, etiqueta: Norma, hallazgo o mandato y su fecha límite, visible_si: { "==": [{ var: datos.origen_normativo_declarado }, true] }, obligatorio_si: { "==": [{ var: datos.origen_normativo_declarado }, true] } }
+      - { clave: proposito, tipo: lista, catalogo: proposito, etiqueta: "¿Qué necesita principalmente?", obligatorio: true, ayuda: "Cambiar un sistema, probar o estimar algo, u obtener datos existentes." }
+      - { clave: categoria_impacto, tipo: lista, catalogo: impacto, etiqueta: Categoría de impacto estimado, obligatorio: true }
+      - { clave: detalle_impacto, tipo: texto, etiqueta: Qué ocurre si no se atiende (una línea), obligatorio: true, max: 250 }
+      - { clave: esfuerzo_dias_persona, tipo: numero, etiqueta: Esfuerzo estimado (días-persona), obligatorio: false, min: 0, ayuda: "Estimación gruesa; si no la conoce, déjela vacía y la estima el PM de demanda." }
+      - { clave: duracion_semanas, tipo: numero, etiqueta: Duración estimada (semanas), obligatorio: false, min: 0 }
+      - { clave: presupuesto_referencial, tipo: moneda, etiqueta: Presupuesto referencial, obligatorio: false }
+      - { clave: presupuesto_plan_anual, tipo: si_no, etiqueta: "¿Tiene presupuesto asignado en el plan anual?", obligatorio: true }
+      - { clave: beneficio_financiero, tipo: lista_multiple, catalogo: beneficio_financiero, etiqueta: Beneficio esperado financiero, obligatorio: true }
+      - { clave: beneficio_no_financiero, tipo: lista_multiple, catalogo: beneficio_no_financiero, etiqueta: Beneficio esperado no financiero, obligatorio: false }
+      - { clave: beneficio_otros, tipo: texto, etiqueta: Describa el beneficio, visible_si: { in: [otros, { var: datos.beneficio_no_financiero }] }, obligatorio_si: { in: [otros, { var: datos.beneficio_no_financiero }] } }
+      - { clave: objetivo_estrategico, tipo: objetivo_estrategico, etiqueta: Objetivo estratégico al que contribuye, obligatorio: true, nucleo: objetivo_estrategico }
+      - { clave: okr_area, tipo: texto, etiqueta: OKR u objetivo del área, obligatorio: false }
+      - { clave: adjuntos, tipo: adjunto, etiqueta: Documentos de soporte, multiple: true, obligatorio: false }
+
+  - clave: B
+    titulo: La completa la Mesa de triage
+    editable_por: [{ rol: pm_demanda }]
+    campos:
+      - { clave: clasificable, tipo: si_no, etiqueta: "¿Se puede clasificar con lo registrado?", obligatorio: true }
+      - { clave: informacion_faltante, tipo: texto_largo, etiqueta: Qué información falta, visible_si: { "==": [{ var: datos.clasificable }, false] }, obligatorio_si: { "==": [{ var: datos.clasificable }, false] } }
+      - { clave: duplicado_de, tipo: demanda_ref, etiqueta: "¿Duplicado de?", obligatorio: false }
+      - { clave: resultado_arbol, tipo: arbol_clasificacion, arbol: arbol-requerimiento-proyecto, etiqueta: Resultado del árbol de decisión, obligatorio_si: { "==": [{ var: datos.clasificable }, true] } }
+      - { clave: grupo, tipo: lista, fuente: grupos, etiqueta: Grupo, calculado_desde: resultado_arbol, nucleo: grupo }
+      - { clave: categoria, tipo: lista, fuente: categorias_del_grupo, etiqueta: Categoría, obligatorio_si: { "==": [{ var: datos.clasificable }, true] }, sugerencia: precedencia, nucleo: categoria }
+      - { clave: razon_categoria, tipo: texto, etiqueta: Razón de la categoría elegida, obligatorio_si: { "!=": [{ var: datos.categoria }, { var: sugerencia.categoria }] } }
+      - { clave: obligacion_externa, tipo: lista, catalogo_marca: obligacion_externa, etiqueta: Obligación externa con fecha, obligatorio: true, marca: obligacion_externa }
+      - { clave: referencia_obligacion, tipo: texto, etiqueta: Referencia de la norma, hallazgo o mandato, visible_si: { "!=": [{ var: datos.obligacion_externa }, no_aplica] } }
+      - { clave: fecha_limite_externa, tipo: fecha, etiqueta: Fecha límite externa, visible_si: { "!=": [{ var: datos.obligacion_externa }, no_aplica] } }
+      - { clave: origen_normativo, tipo: lista, catalogo_marca: origen_normativo, etiqueta: Origen normativo, obligatorio: true, marca: origen_normativo }
+      - { clave: ente_emisor, tipo: texto, etiqueta: Ente emisor, visible_si: { "!=": [{ var: datos.origen_normativo }, no_aplica] } }
+      - { clave: fecha_notificacion, tipo: fecha, etiqueta: Fecha de notificación, visible_si: { "!=": [{ var: datos.origen_normativo }, no_aplica] } }
+      - { clave: verificacion_cumplimiento, tipo: lista, catalogo_marca: origen_normativo_verificado, etiqueta: Verificación de Cumplimiento, solo_lectura: true, marca: origen_normativo_verificado, ayuda: "La registra el área verificadora en su tarea." }
+      - { clave: alcance_normativo, tipo: texto_largo, etiqueta: Parte del alcance que es normativa, solo_lectura: true }
+      - { clave: entrada_directa, tipo: lista, fuente: arbol.entrada_directa, etiqueta: Condición de entrada directa, visible_si: { "==": [{ var: datos.grupo }, proyectos] } }
+      - { clave: referencia_entrada_directa, tipo: texto, etiqueta: Referencia de la condición, visible_si: { "!!": [{ var: datos.entrada_directa }] } }
+      - { clave: urgencia_validada, tipo: lista, catalogo: urgencia, etiqueta: Urgencia (Mesa de triage), obligatorio_si: { "==": [{ var: datos.clasificable }, true] }, nucleo: urgencia_validada }
+      - { clave: razon_urgencia, tipo: texto, etiqueta: Razón si difiere de la declarada, obligatorio_si: { "!=": [{ var: datos.urgencia_validada }, { var: registros.ficha-demanda.A.urgencia }] } }
+      - { clave: dependen_proyectos, tipo: tabla, etiqueta: Proyectos que dependen de esta demanda, columnas: [{ clave: proyecto, tipo: demanda_ref }, { clave: hito, tipo: texto }, { clave: fecha_requerida, tipo: fecha }] }
+    # Campos que el sistema mantiene y la interfaz muestra en esta sección: ruta asignada, fecha de clasificación
+    # o devolución, responsable asignado, seguimiento vigente, fecha objetivo/SLA y estado. No son editables.
+
+  - clave: C
+    titulo: La completa el PM de demanda con el analista de negocio durante el análisis
+    editable_por: [{ rol: pm_demanda }, { rol_demanda: analista_asignado }]
+    campos:
+      - clave: observaciones_especializadas
+        tipo: tabla
+        etiqueta: Observación especializada
+        ayuda: "Se activa si trata datos personales o sensibles, afecta un canal externo, toca el core o la arquitectura, o responde a un requisito regulatorio. Es consultiva."
+        columnas:
+          - { clave: area, tipo: area, filtro_area_tipo: consultiva }
+          - { clave: observacion, tipo: texto_largo }
+          - { clave: fecha, tipo: fecha }
+      - { clave: datos_personales, tipo: lista, catalogo: datos_personales, etiqueta: Datos personales, obligatorio: true }
+      - { clave: referencia_evaluacion_privacidad, tipo: texto, etiqueta: Evaluación vigente que se referencia, visible_si: { "==": [{ var: datos.datos_personales }, tratamiento_ya_evaluado] } }

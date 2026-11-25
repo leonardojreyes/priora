@@ -1,0 +1,46 @@
+# Plantilla: gestión de demanda TIC para banca (marco de referencia v2.0)
+clave: marco-tic-banca
+nombre: Demanda y proyectos TIC (banca)
+version: 1.0.0
+idioma: es-EC
+descripcion: >
+  Traducción del marco metodológico de referencia (docs/referencia/): entrada única con
+  triage, requerimientos (BAU) y pre-proyectos gobernados por la Mesa de Demanda, proyectos
+  gobernados por la Comisión de proyectos, revisión ejecutiva opcional y vinculante,
+  priorización con dos modelos y matriz de capacidades.
+archivos:
+  - empresa.yaml
+  - organizacion.yaml
+  - gobierno.yaml
+  - taxonomia.yaml
+  - estrategia.yaml
+  - arbol-clasificacion.yaml
+  - priorizacion.yaml
+  - capacidad.yaml
+  - plazos.yaml
+  - cambios.yaml
+  - instrumentos/ficha-demanda.yaml
+  - flujos/m0-entrada.yaml
+  - flujos/m1-requerimientos.yaml
+  - flujos/m2-proyectos.yaml
+  - flujos/sub-construir.yaml
+  - flujos/sub-certificar-implementar.yaml
+pendientes:
+  - { archivo: notificaciones.yaml, fase: 3, nota: "Plantillas de mensaje por evento; se amplía en la fase 6" }
+  - { archivo: indicadores.yaml, fase: 6 }
+  - { instrumento: verificacion-origen, codigo: "—", fase: 3, nota: "Formulario breve del área verificadora: confirma, fecha límite, parte normativa del alcance (marco §4.2)" }
+  # Instrumentos que se escriben en su fase a partir de docs/referencia/marco/09-instrumentos.md
+  - { instrumento: historia-usuario, codigo: "9.4", fase: 4 }
+  - { instrumento: ficha-preproyecto, codigo: "9.3", fase: 4 }
+  - { instrumento: plan-transicion, codigo: "9.8", fase: 4 }
+  - { instrumento: solicitud-cambio, codigo: "9.9", fase: 4 }
+  - { instrumento: evaluacion-privacidad, codigo: "9.13", fase: 4 }
+  - { instrumento: cierre-operativo, codigo: "9.15", fase: 4 }
+  - { instrumento: definiciones, codigo: "9.16", fase: 4 }
+  - { instrumento: acta-constitucion, codigo: "9.5", fase: 5 }
+  - { instrumento: matriz-riesgos, codigo: "9.6", fase: 5 }
+  - { instrumento: costo-retorno, codigo: "9.7", fase: 5 }
+  - { instrumento: seguimiento-beneficios, codigo: "9.11", fase: 5 }
+  - { instrumento: ficha-proveedor, codigo: "9.12", fase: 5 }
+  - { instrumento: informe-estado, codigo: "9.18", fase: 5 }
+  - { instrumento: acta-cierre, codigo: "9.19", fase: 5 }

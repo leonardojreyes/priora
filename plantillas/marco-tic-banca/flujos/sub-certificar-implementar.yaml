@@ -1,0 +1,53 @@
+# Subproceso común: etapas 3 (certificación) y 4 (implementación) del marco §5.7.
+# Marco 1: "Desplegar y validar". Marco 2: "Transición a producción".
+clave: sub-certificar-implementar
+nombre: Certificar e implementar
+version: 1
+parametros:
+  registra_pase: { por_defecto: { rol_demanda: responsable_asignado } }
+  firma_pase: { por_defecto: { rol_demanda: dueno_funcional } }
+inicio: certificar
+
+nodos:
+  - id: certificar
+    tipo: tarea
+    nombre: Certificación (funcional, técnica, seguridad y procesos)
+    responsable: { area: gestion-procesos }
+    colaboradores: [{ area: laboratorio-qa }, { area: seguridad-informacion }]
+    al_entrar: [{ cambiar_estado: { valor: en_pruebas } }]
+    instrumentos: [{ clave: plan-transicion, seccion: certificacion, modo: editar }]
+    acciones_usuario:
+      - { clave: certificado, etiqueta: Certificado sin observaciones críticas, a: uat, si: { "!": [{ var: registros.plan-transicion.certificacion.observacion_critica_abierta }] } }
+      - { clave: observacion_critica, etiqueta: Observación crítica, a: corregir, requiere_justificacion: true }
+
+  - id: corregir
+    tipo: tarea
+    nombre: Corregir observación crítica
+    responsable: { rol_demanda: responsable_asignado, alternativa: { rol_demanda: pm_proyecto } }
+    acciones_usuario: [{ clave: completar, etiqueta: Corregido, a: certificar }]
+
+  - id: uat
+    tipo: tarea
+    nombre: Conformidad del dueño funcional sobre la UAT
+    responsable: { rol_demanda: dueno_funcional }
+    instrumentos: [{ clave: plan-transicion, seccion: uat, modo: firmar }]
+    acciones_usuario:
+      - { clave: conforme, etiqueta: Conforme, a: decision-pase }
+      - { clave: no_conforme, etiqueta: No conforme, a: corregir, requiere_justificacion: true }
+
+  - id: decision-pase
+    tipo: tarea
+    nombre: Registrar la decisión de pase a producción
+    responsable: { parametro: registra_pase }
+    instrumentos: [{ clave: plan-transicion, seccion: decision_pase, modo: emitir, firmas: [{ parametro: firma_pase }] }]
+    acciones_usuario: [{ clave: aprobar, etiqueta: Pase aprobado, a: implementar }]
+
+  - id: implementar
+    tipo: tarea
+    nombre: "Implementación: despliegue, contingencia, monitoreo inicial"
+    responsable: { area: tecnologia }
+    acciones_usuario:
+      - { clave: exitoso, etiqueta: Desplegado, a: fin, acciones: [{ registrar_evento: { tipo: cambio_productivo, datos: { resultado: exitoso } } }] }
+      - { clave: revertido, etiqueta: Revertido (rollback), a: corregir, requiere_justificacion: true, acciones: [{ registrar_evento: { tipo: cambio_productivo, datos: { resultado: revertido } } }] }
+
+  - { id: fin, tipo: fin, resultado: completado }
