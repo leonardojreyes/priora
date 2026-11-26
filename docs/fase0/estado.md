@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1, T2 y T3 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T4` (ver spec). Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T4 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T5` (`plantillas:validar`). Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -55,6 +55,7 @@
 
 ## Historial resumido
 
+- 2026-11-26 · 0.2 T4: `modules/ejemplo` (entidad `Ejemplo`, 4 capas), `.dependency-cruiser.cjs` (3 reglas), `pnpm lint:arch` (dependency-cruiser 18.9.0, MIT, en `@priora/scripts`) y comprobación de que `apps/` y `modules/` no referencian `.local/`. 9 fixtures en `scripts/test/fixtures/arquitectura/`.
 - 2026-11-25 · 0.2 T3: `packages/workflow-engine` vacío (`ENGINE_NAME`), una prueba y umbral de cobertura 90% verificado (falla por debajo). `@vitest/coverage-v8` 5.1.2 agregado a `minimumReleaseAgeExclude`.
 - 2026-11-25 · 0.2 T2: `.env.example`, `docs/fase0/variables-de-entorno.md` y prueba que los mantiene sincronizados (`scripts/`, paquete `@priora/scripts`, Vitest 5.1.2).
 - 2026-11-25 · 0.2 T1: raíz del monorepo (pnpm 12.8.1, Turborepo 2.11, ESLint 10, Prettier 3.10, TypeScript 6.0.3 por compatibilidad con typescript-eslint 8.74, que exige TS < 6.1) y `packages/config`. ADR-0020 aceptado (desarrollo nativo sin Docker).

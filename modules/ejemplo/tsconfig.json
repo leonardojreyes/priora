@@ -1,0 +1,5 @@
+{
+  "extends": "@priora/config/tsconfig",
+  "compilerOptions": { "noEmit": true, "types": [] },
+  "include": ["domain", "application", "infrastructure", "interface", "test"]
+}

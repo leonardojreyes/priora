@@ -92,7 +92,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 - [x] **T3** · `packages/workflow-engine` vacío con una prueba y umbral de cobertura del 90% · la prueba pasa y la cobertura se exige · `pnpm --filter @priora/workflow-engine test:coverage` · Dep.: T1.
 
 **Bloque B · Dominio y límites de arquitectura**
-- [ ] **T4** · `modules/ejemplo` con las cuatro capas, una entidad de dominio con prueba, y `.dependency-cruiser.cjs` con fixtures de los tres casos prohibidos (dominio→infraestructura/NestJS/Drizzle/pg-boss/Next; `workflow-engine`→`apps/` o `modules/`; módulo→infraestructura de otro módulo) y la regla "ningún código de `apps/` ni `modules/` referencia `.local/`" · el código real pasa `lint:arch` y cada fixture lo hace fallar · `pnpm lint:arch && pnpm test -- arquitectura` · Dep.: T1.
+- [x] **T4** · `modules/ejemplo` con las cuatro capas, una entidad de dominio con prueba, y `.dependency-cruiser.cjs` con fixtures de los tres casos prohibidos (dominio→infraestructura/NestJS/Drizzle/pg-boss/Next; `workflow-engine`→`apps/` o `modules/`; módulo→infraestructura de otro módulo) y la regla "ningún código de `apps/` ni `modules/` referencia `.local/`" · el código real pasa `lint:arch` y cada fixture lo hace fallar · `pnpm lint:arch && pnpm test -- arquitectura` · Dep.: T1.
 - [ ] **T5** · `pnpm plantillas:validar <carpeta>` (YAML, enlaces rotos, nodos inalcanzables, decisiones sin `por_defecto`) con fixtures propios · pasa sobre `plantillas/marco-tic-banca` y `plantillas/generica-simple`, y falla con cada fixture defectuoso · `pnpm test -- validar-plantillas && pnpm plantillas:validar plantillas/marco-tic-banca` · Dep.: T1.
 
 **Bloque C · Base de datos**
