@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T5 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T6` (`db:init`; requiere PostgreSQL local y superusuario, ver spec §3). Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T6 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T7` (`db:migrate`, drizzle-kit, esquema `pgboss`). `db:init` ya se ejecutó en la máquina del responsable: existen `priora`, `priora_test` y los 3 roles; `.env.local` tiene las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -55,6 +55,7 @@
 
 ## Historial resumido
 
+- 2026-11-26 · 0.2 T6: `pnpm db:init` (`scripts/lib/db-init.mjs`, `scripts/db-init.mjs`; `pg` 8.23.1 MIT). Roles `priora_migrator`, `priora_app`, `priora_test` (NOSUPERUSER, NOBYPASSRLS), bases `priora` y `priora_test` con `pg_trgm`, `.env.local` 0600, sin `DROP`, idempotente. Ejecutado dos veces sobre el PostgreSQL local; las demás bases y roles quedaron idénticos. El PostgreSQL local usa autenticación `trust` (cualquier clave conecta): la prueba de rotación de claves lo detecta y omite esa aserción.
 - 2026-11-26 · 0.2 T5: `pnpm plantillas:validar <carpeta>` (`scripts/lib/validar-plantillas.mjs`, js-yaml 4.1.1 MIT): YAML, ids duplicados, enlaces rotos, flujos inexistentes, nodos inalcanzables o sin salida, decisiones sin `por_defecto`. Un `traspaso` cuenta como terminal. Pasa en ambas plantillas; 9 fixtures en `scripts/test/fixtures/plantillas/`.
 - 2026-11-26 · 0.2 T4: `modules/ejemplo` (entidad `Ejemplo`, 4 capas), `.dependency-cruiser.cjs` (3 reglas), `pnpm lint:arch` (dependency-cruiser 18.9.0, MIT, en `@priora/scripts`) y comprobación de que `apps/` y `modules/` no referencian `.local/`. 9 fixtures en `scripts/test/fixtures/arquitectura/`.
 - 2026-11-25 · 0.2 T3: `packages/workflow-engine` vacío (`ENGINE_NAME`), una prueba y umbral de cobertura 90% verificado (falla por debajo). `@vitest/coverage-v8` 5.1.2 agregado a `minimumReleaseAgeExclude`.
