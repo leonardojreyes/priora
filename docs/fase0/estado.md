@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T8 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T9` (`packages/contracts`: `openapi.json` generado desde la API, `contracts:generate` y `contracts:check`; la API ya expone `generarOpenApi(app)` en `apps/api/src/app.factory.ts`). `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T9 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T10` (`apps/worker`, pg-boss con `ping`; ver nota sobre `createQueue` y CREATE en `pgboss` en Pendientes). `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -58,6 +58,7 @@
 
 ## Historial resumido
 
+- 2026-11-26 · 0.2 T9: `packages/contracts` con `openapi.json` (OpenAPI 3.1 generado desde la API con `apps/api/src/generar-openapi.ts`, sin base) y cliente orval 8.49.0 (MIT, fetch, un archivo) en `src/generated/api.ts`; `getHealth` con `operationId` fijo. `pnpm contracts:generate` y `pnpm contracts:check` (falla ante deriva de contrato o cliente; `scripts/lib/contratos.mjs`). El paquete se consume como TS fuente (`moduleResolution: Bundler`). Código generado excluido de Prettier y ESLint. orval agrega muchas dependencias transitivas: revisar licencias en 0.4.
 - 2026-11-26 · 0.2 T8: `apps/api` (NestJS 12.6.2, Express): `GET /health` → `{status, version, db}` (200 `up` / 503 `down`, `select 1` con tope de 2 s como `priora_app`), prefijo `api/v1` (sin `health`), OpenAPI 3.1 en `/api/docs` y `/api/docs-json`; configuración solo por `DATABASE_URL_APP` y `API_PORT` (3001). Paquete CJS con `@Inject` explícito (esbuild/Vitest no emiten metadatos de decoradores). `pnpm --filter @priora/api build|start|test`. Dependencias MIT/Apache-2.0; scripts de build de esbuild y `@scarf/scarf` (telemetría) siguen sin aprobarse.
 - 2026-11-26 · 0.2 T7: `pnpm db:migrate` (`--prueba` para `priora_test`), `db:seed` (vacío), `db:reset` (confirmación o `--si`; solo bases `priora*`), `db:generate` y `test:integration`. Migración base `infra/db/migrations/0000_base.sql` (drizzle numera desde 0000; es la "0001" de la spec: revoca PUBLIC sobre `public`). `migrar` crea `pgboss` con `getConstructionPlans` si falta y otorga a `priora_app` USAGE, DML y privilegios por defecto, nunca CREATE. drizzle-orm 0.45.4 (Apache-2.0), drizzle-kit 0.31.11 y pg-boss 12.39.0 (MIT). Vitest de `scripts` corre archivos en serie (las pruebas de integración comparan instantáneas del servidor). Corrección `sigsio` → `sigiso` en docs y prueba.
 - 2026-11-26 · 0.2 T6: `pnpm db:init` (`scripts/lib/db-init.mjs`, `scripts/db-init.mjs`; `pg` 8.23.1 MIT). Roles `priora_migrator`, `priora_app`, `priora_test` (NOSUPERUSER, NOBYPASSRLS), bases `priora` y `priora_test` con `pg_trgm`, `.env.local` 0600, sin `DROP`, idempotente. Ejecutado dos veces sobre el PostgreSQL local; las demás bases y roles quedaron idénticos. El PostgreSQL local usa autenticación `trust` (cualquier clave conecta): la prueba de rotación de claves lo detecta y omite esa aserción.

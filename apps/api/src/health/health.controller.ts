@@ -1,6 +1,7 @@
 import { Controller, Get, Inject, ServiceUnavailableException } from '@nestjs/common';
 import {
   ApiOkResponse,
+  ApiOperation,
   ApiProperty,
   ApiServiceUnavailableResponse,
   ApiTags,
@@ -25,6 +26,7 @@ export class HealthController {
   constructor(@Inject(DatabaseService) private readonly database: DatabaseService) {}
 
   @Get()
+  @ApiOperation({ operationId: 'getHealth', summary: 'Estado del servicio y de la base de datos' })
   @ApiOkResponse({ type: HealthDto, description: 'El servicio y la base de datos responden' })
   @ApiServiceUnavailableResponse({ type: HealthDto, description: 'La base de datos no responde' })
   async comprobar(): Promise<HealthDto> {

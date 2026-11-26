@@ -12,3 +12,5 @@ plantillas
 .claude
 *.md
 scripts/test/fixtures/plantillas
+packages/contracts/src/generated
+packages/contracts/openapi.json

@@ -15,6 +15,7 @@ export default tseslint.config(
       '.claude/**',
       'docs/**',
       'plantillas/**',
+      'packages/contracts/src/generated/**',
     ],
   },
   js.configs.recommended,
