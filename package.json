@@ -1,0 +1,27 @@
+{
+  "name": "priora",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Gestión de la demanda de requerimientos y proyectos de TI (SynapTech)",
+  "packageManager": "pnpm@12.8.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@priora/config": "workspace:*",
+    "eslint": "10.15.0",
+    "prettier": "3.10.1",
+    "turbo": "2.11.13",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.74.0"
+  },
+  "prettier": "@priora/config/prettier"
+}

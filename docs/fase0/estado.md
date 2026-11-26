@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.1 cerrado, a la espera de "aprobado". Siguiente: 0.2 Repositorio y esqueleto (rama `fase0/0.2`).
-- **Siguiente acción:** tras "aprobado" y `/clear`, ejecutar `/estado` y empezar 0.2 en modo plan.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 hecha.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T2` (variables de entorno). Repo git local creado; **no hacer push** hasta que el repositorio de GitHub sea privado (hoy es público).
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -41,6 +41,8 @@
 
 ## Pendientes y preguntas abiertas
 
+- **El repositorio de GitHub `leonardojreyes/priora` es público** y `docs/referencia/` es confidencial: hacerlo privado antes del primer push.
+- Primer commit local (`chore: import initial project package`) hecho en `main` y rama de trabajo `fase0/0.2`; `main` aún no existe en el remoto.
 - Confirmar usuario de GitHub del revisor, protección de `main`, destino de despliegue y pruebas en Windows (se aplican los valores por defecto hasta entonces).
 
 - Montos de autorización de la Mesa de Demanda y rango de presupuesto de cambio moderado: "por definir" en el marco; la plantilla los deja en `null` (configurables).
@@ -53,6 +55,7 @@
 
 ## Historial resumido
 
+- 2026-11-25 · 0.2 T1: raíz del monorepo (pnpm 12.8.1, Turborepo 2.11, ESLint 10, Prettier 3.10, TypeScript 6.0.3 por compatibilidad con typescript-eslint 8.74, que exige TS < 6.1) y `packages/config`. ADR-0020 aceptado (desarrollo nativo sin Docker).
 - 2026-11-25 · Paso 0.1 ejecutado: preguntas de arranque, resumen de ADR, 19 ADR aceptados, TODO 0.1 marcada.
 - 2026-11-25 · Paquete inicial del proyecto generado (specs, plantillas, ADR propuestos, context engineering).
 - 2026-11-25 · Nombre cambiado a Priora; agregados PRD.md, ARCHITECTURE.md, TODO.md y el comando /diagnosticar.

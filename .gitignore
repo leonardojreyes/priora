@@ -18,3 +18,4 @@ Thumbs.db
 data/
 storage/
 .claude/settings.local.json
+.local/

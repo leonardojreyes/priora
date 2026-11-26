@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+.next
+.turbo
+coverage
+.local
+pnpm-lock.yaml
+docs/referencia
+docs
+plantillas
+.claude
+*.md
