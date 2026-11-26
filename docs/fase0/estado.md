@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T10 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T11` (`apps/web` Next.js con la página "Priora" y `packages/ui` vacío; también pueden adelantarse T11 y T12). `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T11 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T12` (Keycloak local: `keycloak:install|start|stop|status|reset|realm`; descarga con SHA-256 fijado y JRE en `.local/`). T12 es la tarea que más RAM y red usa: confirmar antes con el responsable. `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -58,6 +58,7 @@
 
 ## Historial resumido
 
+- 2026-11-26 · 0.2 T11: `apps/web` (Next.js 16.4.6, React 19.3.1, next-intl 4.16.2, MIT): página "Priora" con la lista de 6 módulos (entrada, clasificación, priorización, decisiones, ejecución, indicadores) con textos en `messages/es-EC.json`; sin nombres de la plantilla bancaria (la prueba lo verifica). `packages/ui` vacío. `apps/web/scripts/next.mjs` lanza `next` sin telemetría y con `WEB_PORT` (3000). Vitest usa jsdom y `oxc.jsx` (Vite 8). `next-env.d.ts` y `*.tsbuildinfo` ignorados. Sin Tailwind ni shadcn hasta 0.5.
 - 2026-11-26 · 0.2 T10: `apps/worker` (ESM, pg-boss 12.39.0 MIT) como `priora_app` con `migrate:false` y `createSchema:false`; cola `ping` cuyo manejador exige `tenant_id` (ADR-0008) y deja una línea de registro; si falta, el trabajo falla. `pnpm --filter @priora/worker build|start|test` (la integración usa `priora_test`, migrada con `pnpm db:migrate -- --prueba`). Apagado limpio con SIGINT/SIGTERM.
 - 2026-11-26 · 0.2 T9: `packages/contracts` con `openapi.json` (OpenAPI 3.1 generado desde la API con `apps/api/src/generar-openapi.ts`, sin base) y cliente orval 8.49.0 (MIT, fetch, un archivo) en `src/generated/api.ts`; `getHealth` con `operationId` fijo. `pnpm contracts:generate` y `pnpm contracts:check` (falla ante deriva de contrato o cliente; `scripts/lib/contratos.mjs`). El paquete se consume como TS fuente (`moduleResolution: Bundler`). Código generado excluido de Prettier y ESLint. orval agrega muchas dependencias transitivas: revisar licencias en 0.4.
 - 2026-11-26 · 0.2 T8: `apps/api` (NestJS 12.6.2, Express): `GET /health` → `{status, version, db}` (200 `up` / 503 `down`, `select 1` con tope de 2 s como `priora_app`), prefijo `api/v1` (sin `health`), OpenAPI 3.1 en `/api/docs` y `/api/docs-json`; configuración solo por `DATABASE_URL_APP` y `API_PORT` (3001). Paquete CJS con `@Inject` explícito (esbuild/Vitest no emiten metadatos de decoradores). `pnpm --filter @priora/api build|start|test`. Dependencias MIT/Apache-2.0; scripts de build de esbuild y `@scarf/scarf` (telemetría) siguen sin aprobarse.

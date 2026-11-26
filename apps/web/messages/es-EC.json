@@ -1,0 +1,33 @@
+{
+  "Inicio": {
+    "titulo": "Priora",
+    "descripcion": "Gestión de la demanda de requerimientos y proyectos de TI: una sola entrada, priorización contra la capacidad, decisiones con acta y ejecución trazable.",
+    "modulos": {
+      "titulo": "Módulos",
+      "entrada": {
+        "nombre": "Entrada única",
+        "descripcion": "Registro de requerimientos y proyectos por un solo canal."
+      },
+      "clasificacion": {
+        "nombre": "Clasificación",
+        "descripcion": "Triage de cada demanda según el árbol de clasificación de la empresa."
+      },
+      "priorizacion": {
+        "nombre": "Priorización",
+        "descripcion": "Evaluación y orden de las demandas frente a la capacidad disponible."
+      },
+      "decisiones": {
+        "nombre": "Decisiones",
+        "descripcion": "Sesiones colegiadas con acta y seguimiento de acuerdos."
+      },
+      "ejecucion": {
+        "nombre": "Ejecución",
+        "descripcion": "Seguimiento trazable del trabajo hasta el cierre."
+      },
+      "indicadores": {
+        "nombre": "Indicadores",
+        "descripcion": "Plazos, semáforos y métricas de la gestión de la demanda."
+      }
+    }
+  }
+}

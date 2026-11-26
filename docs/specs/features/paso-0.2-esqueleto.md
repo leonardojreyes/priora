@@ -105,7 +105,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 - [x] **T10** · `apps/worker`: pg-boss con `migrate:false` y `createSchema:false`, trabajo `ping` con `tenant_id` ficticio en el payload · prueba de integración: se encola, se procesa y deja una línea de registro · `pnpm --filter @priora/worker test` · Dep.: T7.
 
 **Bloque E · Interfaz e identidad**
-- [ ] **T11** · `apps/web` (Next.js) con la página "Priora" y la lista de módulos, y `packages/ui` vacío · prueba de componente de la página y `next build` sin errores; ningún nombre de la plantilla bancaria en la interfaz · `pnpm --filter @priora/web test && pnpm --filter @priora/web build` · Dep.: T1.
+- [x] **T11** · `apps/web` (Next.js) con la página "Priora" y la lista de módulos, y `packages/ui` vacío · prueba de componente de la página y `next build` sin errores; ningún nombre de la plantilla bancaria en la interfaz · `pnpm --filter @priora/web test && pnpm --filter @priora/web build` · Dep.: T1.
 - [ ] **T12** · Keycloak local: `keycloak:install` (descarga con SHA-256 fijado, JRE en `.local/`), `start|stop|status|reset`, `keycloak:realm` desde `infra/keycloak/realm-priora.plantilla.json`; puerto configurable distinto del de sig-iso; rutas de Windows (`kc.bat`) · pruebas de unidad de las funciones puras (checksum, plan de descarga, argumentos de arranque, plantilla del realm) · `pnpm test -- keycloak` y, manualmente, `pnpm keycloak:install && pnpm keycloak:realm && pnpm keycloak:start && pnpm keycloak:status` · Dep.: T2.
 
 **Bloque F · Integración de punta a punta**

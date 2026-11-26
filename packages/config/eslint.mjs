@@ -16,6 +16,7 @@ export default tseslint.config(
       'docs/**',
       'plantillas/**',
       'packages/contracts/src/generated/**',
+      '**/next-env.d.ts',
     ],
   },
   js.configs.recommended,
