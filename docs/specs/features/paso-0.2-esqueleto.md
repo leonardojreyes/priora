@@ -88,7 +88,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 
 **Bloque A · Base y contratos**
 - [x] **T1** · Raíz del monorepo y `packages/config` (pnpm workspaces, Turborepo, versiones fijadas, `.nvmrc`, `.editorconfig`, ESLint, TS y Prettier compartidos, `.gitignore` con `.local/`) · `pnpm install`, `pnpm lint`, `pnpm typecheck` y `pnpm build` terminan sin error con los paquetes vacíos · `pnpm install && pnpm lint && pnpm typecheck && pnpm build` · Dep.: ninguna.
-- [ ] **T2** · Variables de entorno: `.env.example` y `docs/fase0/variables-de-entorno.md`, más una prueba que falla si falta una variable documentada · la prueba pasa y el `.env.example` no contiene secretos · `pnpm test -- variables-entorno` · Dep.: T1.
+- [x] **T2** · Variables de entorno: `.env.example` y `docs/fase0/variables-de-entorno.md`, más una prueba que falla si falta una variable documentada · la prueba pasa y el `.env.example` no contiene secretos · `pnpm test -- variables-entorno` · Dep.: T1.
 - [ ] **T3** · `packages/workflow-engine` vacío con una prueba y umbral de cobertura del 90% · la prueba pasa y la cobertura se exige · `pnpm --filter @priora/workflow-engine test:coverage` · Dep.: T1.
 
 **Bloque B · Dominio y límites de arquitectura**

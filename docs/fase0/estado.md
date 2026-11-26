@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 hecha.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T2` (variables de entorno). Repo git local creado; **no hacer push** hasta que el repositorio de GitHub sea privado (hoy es público).
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 y T2 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T3` (`workflow-engine` vacío con cobertura 90%). Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -41,7 +41,7 @@
 
 ## Pendientes y preguntas abiertas
 
-- **El repositorio de GitHub `leonardojreyes/priora` es público** y `docs/referencia/` es confidencial: hacerlo privado antes del primer push.
+- **El repositorio de GitHub `leonardojreyes/priora` es público** y `docs/referencia/` es confidencial; el responsable decidió (2026-11-25) que no importa. No se empuja nada sin que lo pida.
 - Primer commit local (`chore: import initial project package`) hecho en `main` y rama de trabajo `fase0/0.2`; `main` aún no existe en el remoto.
 - Confirmar usuario de GitHub del revisor, protección de `main`, destino de despliegue y pruebas en Windows (se aplican los valores por defecto hasta entonces).
 
@@ -55,6 +55,7 @@
 
 ## Historial resumido
 
+- 2026-11-25 · 0.2 T2: `.env.example`, `docs/fase0/variables-de-entorno.md` y prueba que los mantiene sincronizados (`scripts/`, paquete `@priora/scripts`, Vitest 5.1.2).
 - 2026-11-25 · 0.2 T1: raíz del monorepo (pnpm 12.8.1, Turborepo 2.11, ESLint 10, Prettier 3.10, TypeScript 6.0.3 por compatibilidad con typescript-eslint 8.74, que exige TS < 6.1) y `packages/config`. ADR-0020 aceptado (desarrollo nativo sin Docker).
 - 2026-11-25 · Paso 0.1 ejecutado: preguntas de arranque, resumen de ADR, 19 ADR aceptados, TODO 0.1 marcada.
 - 2026-11-25 · Paquete inicial del proyecto generado (specs, plantillas, ADR propuestos, context engineering).
