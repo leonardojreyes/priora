@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T6 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T7` (`db:migrate`, drizzle-kit, esquema `pgboss`). `db:init` ya se ejecutó en la máquina del responsable: existen `priora`, `priora_test` y los 3 roles; `.env.local` tiene las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T7 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T8` (`apps/api`, NestJS, `GET /health`). `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -27,10 +27,10 @@
 | Revisores humanos | Solo el responsable: usuario de GitHub `leonardojreyes` (deducido de la URL del repo) |
 | Destino del primer despliegue | no respondida; por defecto: solo local hasta la fase 4 |
 | Desarrolladores en Windows | no respondida; por defecto: sí, se prueba en ambos |
-| PostgreSQL | Ya instalado localmente: 16.15, puerto 5432, con bases `orbyta` y `sigsio` de otros proyectos. **Opción B:** el responsable usa su instancia local en lugar del contenedor |
+| PostgreSQL | Ya instalado localmente: 16.15, puerto 5432, con bases `orbyta` y `sigiso` de otros proyectos. **Opción B:** el responsable usa su instancia local en lugar del contenedor |
 
 - 2026-11-25 · **Paso 0.1:** los 19 ADR (0001 a 0019) pasan a **Aceptado** tal cual, sin cambios de texto (decisión del responsable, opción b).
-- 2026-11-25 · PostgreSQL local (opción B): se creará `priora` y `priora_test` sin tocar `orbyta` ni `sigsio`; roles `priora_migrator` y `priora_app` (los roles son globales del servidor). Contraseñas solo en `.env`.
+- 2026-11-25 · PostgreSQL local (opción B): se creará `priora` y `priora_test` sin tocar `orbyta` ni `sigiso`; roles `priora_migrator` y `priora_app` (los roles son globales del servidor). Contraseñas solo en `.env`.
 
 ## Observaciones técnicas del asistente (no incorporadas a los ADR; tratar en el paso indicado)
 
@@ -49,12 +49,16 @@
 - Instrumentos de la plantilla bancaria pendientes por fase: ver `plantillas/marco-tic-banca/plantilla.yaml › pendientes`.
 - Feriados de Ecuador: cargar en la fase 1.
 
+- **pg-boss y `priora_app` (para T10):** `boss.createQueue` crea tablas particionadas en `pgboss`, lo que exige CREATE en ese esquema, que `priora_app` no tiene. Crear las colas (p. ej. `ping`) desde `db:migrate` con el rol migrador, o decidir el privilegio en T10.
+- **Actualizar pg-boss:** `migrar` solo instala el esquema si falta; no aplica `getMigrationPlans` al subir de versión (tratar en la fase que fije la versión definitiva).
+
 ## Diferencias detectadas entre el marco y las specs
 
 (ninguna aún)
 
 ## Historial resumido
 
+- 2026-11-26 · 0.2 T7: `pnpm db:migrate` (`--prueba` para `priora_test`), `db:seed` (vacío), `db:reset` (confirmación o `--si`; solo bases `priora*`), `db:generate` y `test:integration`. Migración base `infra/db/migrations/0000_base.sql` (drizzle numera desde 0000; es la "0001" de la spec: revoca PUBLIC sobre `public`). `migrar` crea `pgboss` con `getConstructionPlans` si falta y otorga a `priora_app` USAGE, DML y privilegios por defecto, nunca CREATE. drizzle-orm 0.45.4 (Apache-2.0), drizzle-kit 0.31.11 y pg-boss 12.39.0 (MIT). Vitest de `scripts` corre archivos en serie (las pruebas de integración comparan instantáneas del servidor). Corrección `sigsio` → `sigiso` en docs y prueba.
 - 2026-11-26 · 0.2 T6: `pnpm db:init` (`scripts/lib/db-init.mjs`, `scripts/db-init.mjs`; `pg` 8.23.1 MIT). Roles `priora_migrator`, `priora_app`, `priora_test` (NOSUPERUSER, NOBYPASSRLS), bases `priora` y `priora_test` con `pg_trgm`, `.env.local` 0600, sin `DROP`, idempotente. Ejecutado dos veces sobre el PostgreSQL local; las demás bases y roles quedaron idénticos. El PostgreSQL local usa autenticación `trust` (cualquier clave conecta): la prueba de rotación de claves lo detecta y omite esa aserción.
 - 2026-11-26 · 0.2 T5: `pnpm plantillas:validar <carpeta>` (`scripts/lib/validar-plantillas.mjs`, js-yaml 4.1.1 MIT): YAML, ids duplicados, enlaces rotos, flujos inexistentes, nodos inalcanzables o sin salida, decisiones sin `por_defecto`. Un `traspaso` cuenta como terminal. Pasa en ambas plantillas; 9 fixtures en `scripts/test/fixtures/plantillas/`.
 - 2026-11-26 · 0.2 T4: `modules/ejemplo` (entidad `Ejemplo`, 4 capas), `.dependency-cruiser.cjs` (3 reglas), `pnpm lint:arch` (dependency-cruiser 18.9.0, MIT, en `@priora/scripts`) y comprobación de que `apps/` y `modules/` no referencian `.local/`. 9 fixtures en `scripts/test/fixtures/arquitectura/`.

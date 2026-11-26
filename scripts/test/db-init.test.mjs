@@ -16,7 +16,7 @@ import {
 // Administrador simulado (sin Postgres)
 // ---------------------------------------------------------------------------
 
-const ajenos = /orbyta|sigsio/i;
+const ajenos = /orbyta|sigiso/i;
 
 function crearSimulado({ roles = [], bases = [] } = {}) {
   const rolesExistentes = new Set(roles);
@@ -532,7 +532,7 @@ describe.skipIf(!hayPostgres)('inicializar (PostgreSQL real)', () => {
     // las URLs anteriores ya no sirven: la clave fue repuesta (solo verificable si el servidor
     // valida claves; con autenticación `trust` cualquier clave conecta)
     const erronea = new URL(urls.app);
-    erronea.password = 'clave-erronea';
+    erronea.password = generarClave();
     if (!(await intentar(erronea.toString()))) {
       const viejas = urlsDe(envInicial);
       expect(await intentar(viejas.app)).toBe(false);

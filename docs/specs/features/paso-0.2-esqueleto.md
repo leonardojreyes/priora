@@ -28,7 +28,7 @@ Confirmar y fijar: Node 22 LTS (`.nvmrc`, `engines`), pnpm (`packageManager`), N
 **Infra:** `infra/keycloak/realm-priora.plantilla.json` (sin usuarios; llegan en 0.6).
 
 ### 3. Datos y migraciones
-- `pnpm db:init` (idempotente, superusuario local): bases `priora` y `priora_test`; roles `priora_migrator` (dueño), `priora_app` (NOBYPASSRLS) y `priora_test`; extensión `pg_trgm`. Escribe `DATABASE_URL_MIGRATOR`, `DATABASE_URL_APP` y `DATABASE_URL_TEST` en `.env.local` (0600). **Sin ningún `DROP`** y solo sobre objetos `priora*`; no toca `orbyta` ni `sigsio`.
+- `pnpm db:init` (idempotente, superusuario local): bases `priora` y `priora_test`; roles `priora_migrator` (dueño), `priora_app` (NOBYPASSRLS) y `priora_test`; extensión `pg_trgm`. Escribe `DATABASE_URL_MIGRATOR`, `DATABASE_URL_APP` y `DATABASE_URL_TEST` en `.env.local` (0600). **Sin ningún `DROP`** y solo sobre objetos `priora*`; no toca `orbyta` ni `sigiso`.
 - Migración 0001 mínima con Drizzle. Sin tablas de negocio.
 - `db:migrate` crea el esquema `pgboss` con el rol migrador y otorga `USAGE` y privilegios (incluidos los por defecto) a `priora_app`.
 - `db:reset` (con confirmación) solo actúa sobre `priora*`.
@@ -96,8 +96,8 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 - [x] **T5** · `pnpm plantillas:validar <carpeta>` (YAML, enlaces rotos, nodos inalcanzables, decisiones sin `por_defecto`) con fixtures propios · pasa sobre `plantillas/marco-tic-banca` y `plantillas/generica-simple`, y falla con cada fixture defectuoso · `pnpm test -- validar-plantillas && pnpm plantillas:validar plantillas/marco-tic-banca` · Dep.: T1.
 
 **Bloque C · Base de datos**
-- [x] **T6** · `pnpm db:init` (lib y script adaptados de sig-iso): bases `priora` y `priora_test`, roles `priora_migrator`, `priora_app` (NOBYPASSRLS) y `priora_test`, `pg_trgm`, URLs en `.env.local` con permisos 0600; idempotente y sin `DROP` · pruebas de unidad con administrador simulado e integración sobre PostgreSQL local; una segunda ejecución no cambia nada y `orbyta` y `sigsio` quedan intactas · `pnpm test -- db-init && pnpm db:init && pnpm db:init` · Dep.: T2.
-- [ ] **T7** · `pnpm db:migrate`: drizzle-kit con migración 0001 mínima, esquema `pgboss` creado por el rol migrador y `GRANT` con privilegios por defecto para `priora_app`; `db:seed` vacío; `db:reset` con confirmación y solo sobre `priora*` · prueba de integración: `priora_app` opera sobre `pgboss` y no puede crear tablas ni saltar RLS · `pnpm db:migrate && pnpm test:integration -- db-migrate` · Dep.: T6.
+- [x] **T6** · `pnpm db:init` (lib y script adaptados de sig-iso): bases `priora` y `priora_test`, roles `priora_migrator`, `priora_app` (NOBYPASSRLS) y `priora_test`, `pg_trgm`, URLs en `.env.local` con permisos 0600; idempotente y sin `DROP` · pruebas de unidad con administrador simulado e integración sobre PostgreSQL local; una segunda ejecución no cambia nada y `orbyta` y `sigiso` quedan intactas · `pnpm test -- db-init && pnpm db:init && pnpm db:init` · Dep.: T2.
+- [x] **T7** · `pnpm db:migrate`: drizzle-kit con migración 0001 mínima, esquema `pgboss` creado por el rol migrador y `GRANT` con privilegios por defecto para `priora_app`; `db:seed` vacío; `db:reset` con confirmación y solo sobre `priora*` · prueba de integración: `priora_app` opera sobre `pgboss` y no puede crear tablas ni saltar RLS · `pnpm db:migrate && pnpm test:integration -- db-migrate` · Dep.: T6.
 
 **Bloque D · API, contratos y worker**
 - [ ] **T8** · `apps/api` (NestJS): `GET /health` → `{ status, version, db }`, OpenAPI en `/api/docs`, prefijo `/api/v1`, conexión como `priora_app` · prueba de integración con base real: `/health` responde 200 con `db: up` y 503 con `db: down` · `pnpm --filter @priora/api test` · Dep.: T1, T7.

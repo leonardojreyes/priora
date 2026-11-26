@@ -6,7 +6,7 @@
 - **Licencias involucradas:** PostgreSQL License (PostgreSQL), Apache 2.0 (Keycloak), GPLv2+Classpath Exception (OpenJDK, solo como runtime local descargado, no se distribuye)
 
 ## Contexto
-El equipo de desarrollo (MacBook M1 de 8 GB) no puede ejecutar Docker Desktop (~2 GB de RAM). El proyecto hermano sig-iso resolvió lo mismo con desarrollo nativo y funciona bien: PostgreSQL de Homebrew, Keycloak y su JRE descargados a `.local/`, y scripts de Node para inicializar todo. En la máquina ya hay PostgreSQL 16.15 en el puerto 5432 con bases de otros proyectos (`orbyta`, `sigsio`) que no deben tocarse.
+El equipo de desarrollo (MacBook M1 de 8 GB) no puede ejecutar Docker Desktop (~2 GB de RAM). El proyecto hermano sig-iso resolvió lo mismo con desarrollo nativo y funciona bien: PostgreSQL de Homebrew, Keycloak y su JRE descargados a `.local/`, y scripts de Node para inicializar todo. En la máquina ya hay PostgreSQL 16.15 en el puerto 5432 con bases de otros proyectos (`orbyta`, `sigiso`) que no deben tocarse.
 
 ## Decisión
 1. **Desarrollo y pruebas, cero contenedores.** PostgreSQL 16 local (Homebrew en macOS; instalador oficial en Windows). Keycloak y un JRE se descargan a `.local/` (ignorado por git) con `pnpm keycloak:install` y se manejan con `pnpm keycloak:start|stop|status|reset|realm`. API, worker y web con Node nativo (`pnpm dev`).

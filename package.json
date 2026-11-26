@@ -15,7 +15,12 @@
     "lint:arch": "node scripts/lint-arch.mjs",
     "db:init": "node scripts/db-init.mjs",
     "plantillas:validar": "node scripts/validar-plantillas.mjs",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:generate": "node scripts/node_modules/drizzle-kit/bin.cjs generate --config infra/db/drizzle.config.ts",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "db:seed": "node scripts/db-seed.mjs",
+    "db:reset": "node scripts/db-reset.mjs",
+    "test:integration": "pnpm --filter @priora/scripts test"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
