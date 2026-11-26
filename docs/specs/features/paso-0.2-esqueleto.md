@@ -100,7 +100,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 - [x] **T7** · `pnpm db:migrate`: drizzle-kit con migración 0001 mínima, esquema `pgboss` creado por el rol migrador y `GRANT` con privilegios por defecto para `priora_app`; `db:seed` vacío; `db:reset` con confirmación y solo sobre `priora*` · prueba de integración: `priora_app` opera sobre `pgboss` y no puede crear tablas ni saltar RLS · `pnpm db:migrate && pnpm test:integration -- db-migrate` · Dep.: T6.
 
 **Bloque D · API, contratos y worker**
-- [ ] **T8** · `apps/api` (NestJS): `GET /health` → `{ status, version, db }`, OpenAPI en `/api/docs`, prefijo `/api/v1`, conexión como `priora_app` · prueba de integración con base real: `/health` responde 200 con `db: up` y 503 con `db: down` · `pnpm --filter @priora/api test` · Dep.: T1, T7.
+- [x] **T8** · `apps/api` (NestJS): `GET /health` → `{ status, version, db }`, OpenAPI en `/api/docs`, prefijo `/api/v1`, conexión como `priora_app` · prueba de integración con base real: `/health` responde 200 con `db: up` y 503 con `db: down` · `pnpm --filter @priora/api test` · Dep.: T1, T7.
 - [ ] **T9** · `packages/contracts`: `openapi.json` generado desde la API, `contracts:generate`, cliente mínimo y comprobación de deriva · `contracts:check` falla si el contrato versionado difiere del generado · `pnpm contracts:generate && pnpm contracts:check` · Dep.: T8.
 - [ ] **T10** · `apps/worker`: pg-boss con `migrate:false` y `createSchema:false`, trabajo `ping` con `tenant_id` ficticio en el payload · prueba de integración: se encola, se procesa y deja una línea de registro · `pnpm --filter @priora/worker test` · Dep.: T7.
 
