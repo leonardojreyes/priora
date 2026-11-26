@@ -1,0 +1,36 @@
+clave: f1
+nombre: Flujo uno
+version: 1
+inicio: a
+nodos:
+  - id: a
+    tipo: tarea
+    acciones_usuario:
+      - { clave: completar, etiqueta: Completar, a: d }
+  - id: d
+    tipo: decision
+    reglas:
+      - { si: { "==": [{ var: vars.x }, true] }, a: p }
+    por_defecto: p
+  - id: p
+    tipo: paralelo
+    ramas: [{ a: r1 }, { a: r2 }]
+  - id: r1
+    tipo: tarea
+    acciones_usuario:
+      - { clave: completar, etiqueta: Completar, a: u }
+  - id: r2
+    tipo: tarea
+    acciones_usuario:
+      - { clave: completar, etiqueta: Completar, a: u }
+  - id: u
+    tipo: union
+    espera: [r1, r2]
+    salidas: [{ a: s }]
+  - id: s
+    tipo: subflujo
+    flujo: f2
+    salidas: [{ a: z }]
+  - id: z
+    tipo: fin
+    resultado: completado

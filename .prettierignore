@@ -11,3 +11,4 @@ docs
 plantillas
 .claude
 *.md
+scripts/test/fixtures/plantillas

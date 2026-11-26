@@ -1,0 +1,12 @@
+clave: f1
+nombre: Flujo uno
+version: 1
+inicio: a
+nodos:
+  - id: a
+    tipo: decision
+    reglas:
+      - { si: { "==": [1, 1] }, a: b }
+  - id: b
+    tipo: fin
+    resultado: completado

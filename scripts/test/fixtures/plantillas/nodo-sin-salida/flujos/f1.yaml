@@ -1,0 +1,8 @@
+clave: f1
+nombre: Flujo uno
+version: 1
+inicio: a
+nodos:
+  - id: a
+    tipo: tarea
+    nombre: Sin salida
