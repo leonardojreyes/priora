@@ -102,7 +102,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 **Bloque D · API, contratos y worker**
 - [x] **T8** · `apps/api` (NestJS): `GET /health` → `{ status, version, db }`, OpenAPI en `/api/docs`, prefijo `/api/v1`, conexión como `priora_app` · prueba de integración con base real: `/health` responde 200 con `db: up` y 503 con `db: down` · `pnpm --filter @priora/api test` · Dep.: T1, T7.
 - [x] **T9** · `packages/contracts`: `openapi.json` generado desde la API, `contracts:generate`, cliente mínimo y comprobación de deriva · `contracts:check` falla si el contrato versionado difiere del generado · `pnpm contracts:generate && pnpm contracts:check` · Dep.: T8.
-- [ ] **T10** · `apps/worker`: pg-boss con `migrate:false` y `createSchema:false`, trabajo `ping` con `tenant_id` ficticio en el payload · prueba de integración: se encola, se procesa y deja una línea de registro · `pnpm --filter @priora/worker test` · Dep.: T7.
+- [x] **T10** · `apps/worker`: pg-boss con `migrate:false` y `createSchema:false`, trabajo `ping` con `tenant_id` ficticio en el payload · prueba de integración: se encola, se procesa y deja una línea de registro · `pnpm --filter @priora/worker test` · Dep.: T7.
 
 **Bloque E · Interfaz e identidad**
 - [ ] **T11** · `apps/web` (Next.js) con la página "Priora" y la lista de módulos, y `packages/ui` vacío · prueba de componente de la página y `next build` sin errores; ningún nombre de la plantilla bancaria en la interfaz · `pnpm --filter @priora/web test && pnpm --filter @priora/web build` · Dep.: T1.

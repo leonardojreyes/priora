@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T9 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T10` (`apps/worker`, pg-boss con `ping`; ver nota sobre `createQueue` y CREATE en `pgboss` en Pendientes). `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T10 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T11` (`apps/web` Next.js con la página "Priora" y `packages/ui` vacío; también pueden adelantarse T11 y T12). `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -49,7 +49,7 @@
 - Instrumentos de la plantilla bancaria pendientes por fase: ver `plantillas/marco-tic-banca/plantilla.yaml › pendientes`.
 - Feriados de Ecuador: cargar en la fase 1.
 
-- **pg-boss y `priora_app` (para T10):** `boss.createQueue` crea tablas particionadas en `pgboss`, lo que exige CREATE en ese esquema, que `priora_app` no tiene. Crear las colas (p. ej. `ping`) desde `db:migrate` con el rol migrador, o decidir el privilegio en T10.
+- **pg-boss y `priora_app`:** resuelto en T10. Con colas no particionadas (la opción por defecto) `createQueue` solo inserta una fila y `priora_app` no necesita CREATE en `pgboss`. Si una cola futura usa `partition: true`, habrá que crearla con el rol migrador.
 - **Actualizar pg-boss:** `migrar` solo instala el esquema si falta; no aplica `getMigrationPlans` al subir de versión (tratar en la fase que fije la versión definitiva).
 
 ## Diferencias detectadas entre el marco y las specs
@@ -58,6 +58,7 @@
 
 ## Historial resumido
 
+- 2026-11-26 · 0.2 T10: `apps/worker` (ESM, pg-boss 12.39.0 MIT) como `priora_app` con `migrate:false` y `createSchema:false`; cola `ping` cuyo manejador exige `tenant_id` (ADR-0008) y deja una línea de registro; si falta, el trabajo falla. `pnpm --filter @priora/worker build|start|test` (la integración usa `priora_test`, migrada con `pnpm db:migrate -- --prueba`). Apagado limpio con SIGINT/SIGTERM.
 - 2026-11-26 · 0.2 T9: `packages/contracts` con `openapi.json` (OpenAPI 3.1 generado desde la API con `apps/api/src/generar-openapi.ts`, sin base) y cliente orval 8.49.0 (MIT, fetch, un archivo) en `src/generated/api.ts`; `getHealth` con `operationId` fijo. `pnpm contracts:generate` y `pnpm contracts:check` (falla ante deriva de contrato o cliente; `scripts/lib/contratos.mjs`). El paquete se consume como TS fuente (`moduleResolution: Bundler`). Código generado excluido de Prettier y ESLint. orval agrega muchas dependencias transitivas: revisar licencias en 0.4.
 - 2026-11-26 · 0.2 T8: `apps/api` (NestJS 12.6.2, Express): `GET /health` → `{status, version, db}` (200 `up` / 503 `down`, `select 1` con tope de 2 s como `priora_app`), prefijo `api/v1` (sin `health`), OpenAPI 3.1 en `/api/docs` y `/api/docs-json`; configuración solo por `DATABASE_URL_APP` y `API_PORT` (3001). Paquete CJS con `@Inject` explícito (esbuild/Vitest no emiten metadatos de decoradores). `pnpm --filter @priora/api build|start|test`. Dependencias MIT/Apache-2.0; scripts de build de esbuild y `@scarf/scarf` (telemetría) siguen sin aprobarse.
 - 2026-11-26 · 0.2 T7: `pnpm db:migrate` (`--prueba` para `priora_test`), `db:seed` (vacío), `db:reset` (confirmación o `--si`; solo bases `priora*`), `db:generate` y `test:integration`. Migración base `infra/db/migrations/0000_base.sql` (drizzle numera desde 0000; es la "0001" de la spec: revoca PUBLIC sobre `public`). `migrar` crea `pgboss` con `getConstructionPlans` si falta y otorga a `priora_app` USAGE, DML y privilegios por defecto, nunca CREATE. drizzle-orm 0.45.4 (Apache-2.0), drizzle-kit 0.31.11 y pg-boss 12.39.0 (MIT). Vitest de `scripts` corre archivos en serie (las pruebas de integración comparan instantáneas del servidor). Corrección `sigsio` → `sigiso` en docs y prueba.
