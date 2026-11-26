@@ -89,7 +89,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 **Bloque A · Base y contratos**
 - [x] **T1** · Raíz del monorepo y `packages/config` (pnpm workspaces, Turborepo, versiones fijadas, `.nvmrc`, `.editorconfig`, ESLint, TS y Prettier compartidos, `.gitignore` con `.local/`) · `pnpm install`, `pnpm lint`, `pnpm typecheck` y `pnpm build` terminan sin error con los paquetes vacíos · `pnpm install && pnpm lint && pnpm typecheck && pnpm build` · Dep.: ninguna.
 - [x] **T2** · Variables de entorno: `.env.example` y `docs/fase0/variables-de-entorno.md`, más una prueba que falla si falta una variable documentada · la prueba pasa y el `.env.example` no contiene secretos · `pnpm test -- variables-entorno` · Dep.: T1.
-- [ ] **T3** · `packages/workflow-engine` vacío con una prueba y umbral de cobertura del 90% · la prueba pasa y la cobertura se exige · `pnpm --filter @priora/workflow-engine test:coverage` · Dep.: T1.
+- [x] **T3** · `packages/workflow-engine` vacío con una prueba y umbral de cobertura del 90% · la prueba pasa y la cobertura se exige · `pnpm --filter @priora/workflow-engine test:coverage` · Dep.: T1.
 
 **Bloque B · Dominio y límites de arquitectura**
 - [ ] **T4** · `modules/ejemplo` con las cuatro capas, una entidad de dominio con prueba, y `.dependency-cruiser.cjs` con fixtures de los tres casos prohibidos (dominio→infraestructura/NestJS/Drizzle/pg-boss/Next; `workflow-engine`→`apps/` o `modules/`; módulo→infraestructura de otro módulo) y la regla "ningún código de `apps/` ni `modules/` referencia `.local/`" · el código real pasa `lint:arch` y cada fixture lo hace fallar · `pnpm lint:arch && pnpm test -- arquitectura` · Dep.: T1.

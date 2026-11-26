@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 y T2 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T3` (`workflow-engine` vacío con cobertura 90%). Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1, T2 y T3 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T4` (ver spec). Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -55,6 +55,7 @@
 
 ## Historial resumido
 
+- 2026-11-25 · 0.2 T3: `packages/workflow-engine` vacío (`ENGINE_NAME`), una prueba y umbral de cobertura 90% verificado (falla por debajo). `@vitest/coverage-v8` 5.1.2 agregado a `minimumReleaseAgeExclude`.
 - 2026-11-25 · 0.2 T2: `.env.example`, `docs/fase0/variables-de-entorno.md` y prueba que los mantiene sincronizados (`scripts/`, paquete `@priora/scripts`, Vitest 5.1.2).
 - 2026-11-25 · 0.2 T1: raíz del monorepo (pnpm 12.8.1, Turborepo 2.11, ESLint 10, Prettier 3.10, TypeScript 6.0.3 por compatibilidad con typescript-eslint 8.74, que exige TS < 6.1) y `packages/config`. ADR-0020 aceptado (desarrollo nativo sin Docker).
 - 2026-11-25 · Paso 0.1 ejecutado: preguntas de arranque, resumen de ADR, 19 ADR aceptados, TODO 0.1 marcada.
