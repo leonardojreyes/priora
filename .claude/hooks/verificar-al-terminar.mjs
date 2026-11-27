@@ -9,8 +9,18 @@ const entrada = leerEntrada();
 if (entrada?.stop_hook_active) permitir(); // evita bucles: ya se le devolvió un error en este turno
 
 const raiz = raizProyecto();
-function ejecutar(cmd, args, timeout = 180_000) {
-  return spawnSync(cmd, args, { cwd: raiz, encoding: 'utf8', shell: process.platform === 'win32', timeout });
+function ejecutar(cmd, args, timeout = 180_000, cwd = raiz) {
+  return spawnSync(cmd, args, { cwd, encoding: 'utf8', shell: process.platform === 'win32', timeout });
+}
+
+// Paquete del workspace al que pertenece un archivo: la carpeta con package.json más cercana, sin llegar a la raíz.
+function paqueteDe(archivo) {
+  let dir = path.dirname(path.join(raiz, archivo));
+  while (dir.startsWith(raiz) && dir !== raiz) {
+    if (existsSync(path.join(dir, 'package.json'))) return dir;
+    dir = path.dirname(dir);
+  }
+  return null;
 }
 
 const git = ejecutar('git', ['status', '--porcelain', '-uall']);
@@ -47,12 +57,26 @@ const tsCambiados = cambiados.filter((f) => /\.(ts|tsx)$/.test(f));
 if (hayDependencias && tsCambiados.length > 0) {
   const pkg = JSON.parse(readFileSync(path.join(raiz, 'package.json'), 'utf8'));
   if (pkg.scripts?.typecheck) {
-    const r = ejecutar('pnpm', ['-s', 'typecheck']);
+    // Sin `-s`: pnpm 12 no lo acepta. Solo importa el código de salida.
+    const r = ejecutar('pnpm', ['typecheck']);
     if (r.status !== 0) problemas.push(`typecheck falló:\n${(r.stdout + r.stderr).slice(-2500)}`);
   }
   if (tsCambiados.length <= 25) {
-    const r = ejecutar('pnpm', ['exec', 'vitest', 'related', '--run', '--passWithNoTests', ...tsCambiados]);
-    if (r.status !== 0) problemas.push(`pruebas relacionadas fallaron:\n${(r.stdout + r.stderr).slice(-2500)}`);
+    // Vitest vive en cada paquete (no en la raíz): las pruebas relacionadas se buscan desde su propio paquete.
+    const porPaquete = new Map();
+    for (const archivo of tsCambiados) {
+      const dir = paqueteDe(archivo);
+      if (!dir) continue;
+      const manifiesto = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
+      if (!/vitest/.test(manifiesto.scripts?.test ?? '')) continue;
+      porPaquete.set(dir, [...(porPaquete.get(dir) ?? []), path.relative(dir, path.join(raiz, archivo))]);
+    }
+    for (const [dir, archivos] of porPaquete) {
+      const r = ejecutar('pnpm', ['exec', 'vitest', 'related', '--run', '--passWithNoTests', ...archivos], 180_000, dir);
+      if (r.status !== 0) {
+        problemas.push(`pruebas relacionadas fallaron en ${path.relative(raiz, dir)}:\n${(r.stdout + r.stderr).slice(-2500)}`);
+      }
+    }
   }
 }
 

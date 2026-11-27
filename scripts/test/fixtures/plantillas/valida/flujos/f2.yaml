@@ -1,0 +1,13 @@
+clave: f2
+nombre: Flujo dos
+version: 1
+inicio: i
+nodos:
+  - id: i
+    tipo: accion
+    acciones:
+      - cambiar_estado: { valor: abierta }
+    salidas: [{ a: z }]
+  - id: z
+    tipo: fin
+    resultado: completado

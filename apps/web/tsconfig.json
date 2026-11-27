@@ -1,0 +1,17 @@
+{
+  "extends": "@priora/config/tsconfig",
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "types": ["node"]
+  },
+  "include": ["next-env.d.ts", "src", "messages", "test", "*.ts", "*.mts", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "priora",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Gestión de la demanda de requerimientos y proyectos de TI (SynapTech)",
+  "packageManager": "pnpm@12.8.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "eslint . && prettier --check .",
+    "lint:arch": "node scripts/lint-arch.mjs",
+    "db:init": "node scripts/db-init.mjs",
+    "plantillas:validar": "node scripts/validar-plantillas.mjs",
+    "format": "prettier --write .",
+    "db:generate": "node scripts/node_modules/drizzle-kit/bin.cjs generate --config infra/db/drizzle.config.ts",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "db:seed": "node scripts/db-seed.mjs",
+    "db:reset": "node scripts/db-reset.mjs",
+    "test:integration": "pnpm --filter @priora/scripts test",
+    "contracts:generate": "node scripts/contratos.mjs generate",
+    "contracts:check": "node scripts/contratos.mjs check",
+    "keycloak:install": "node scripts/keycloak-dev.mjs install",
+    "keycloak:start": "node scripts/keycloak-dev.mjs start",
+    "keycloak:stop": "node scripts/keycloak-dev.mjs stop",
+    "keycloak:status": "node scripts/keycloak-dev.mjs status",
+    "keycloak:reset": "node scripts/keycloak-dev.mjs reset",
+    "keycloak:realm": "node scripts/keycloak-realm.mjs",
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "dev": "node scripts/dev.mjs",
+    "ram-report": "node scripts/ram-report.mjs",
+    "verificar:esqueleto": "node scripts/verificar-esqueleto.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@priora/config": "workspace:*",
+    "eslint": "10.15.0",
+    "prettier": "3.10.1",
+    "turbo": "2.11.13",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.74.0"
+  },
+  "prettier": "@priora/config/prettier"
+}

@@ -1,0 +1,12 @@
+clave: f1
+nombre: Flujo uno
+version: 1
+inicio: z
+nodos:
+  - id: a
+    tipo: tarea
+    acciones_usuario:
+      - { clave: completar, etiqueta: Completar, a: b }
+  - id: b
+    tipo: fin
+    resultado: completado

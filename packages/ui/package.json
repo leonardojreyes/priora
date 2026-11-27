@@ -1,0 +1,15 @@
+{
+  "name": "@priora/ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@priora/config": "workspace:*",
+    "typescript": "6.0.3"
+  }
+}

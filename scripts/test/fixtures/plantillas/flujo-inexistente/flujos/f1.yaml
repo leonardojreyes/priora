@@ -1,0 +1,12 @@
+clave: f1
+nombre: Flujo uno
+version: 1
+inicio: a
+nodos:
+  - id: a
+    tipo: subflujo
+    flujo: no-existe
+    salidas: [{ a: b }]
+  - id: b
+    tipo: fin
+    resultado: completado

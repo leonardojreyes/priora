@@ -1,0 +1,5 @@
+{
+  "extends": "@priora/config/tsconfig",
+  "compilerOptions": { "noEmit": true, "types": [] },
+  "include": ["src", "test", "vitest.config.ts"]
+}

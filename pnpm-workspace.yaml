@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+  - modules/*
+  - packages/*
+  - scripts
+minimumReleaseAgeExclude:
+  - '@vitest/mocker@5.1.2'
+  - '@vitest/spy@5.1.2'
+  - vitest@5.1.2
+  - '@vitest/coverage-v8@5.1.2'

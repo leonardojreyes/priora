@@ -30,13 +30,13 @@
 | P7 | Privacidad por diseño (LOPDP) | Campos `dato_personal` en instrumentos + subagente `revisor-cumplimiento` |
 | P8 | IA desacoplada y gobernada | Puerto `AsistenteIA` en el dominio cuando se active |
 | P9 | Observable y etiquetado por empresa | OpenTelemetry + logs JSON con `tenant_id` |
-| P10 | Todo como código | Compose, migraciones, plantillas y configuración versionadas; Helm/OpenTofu en fase 8 |
+| P10 | Todo como código | Migraciones, plantillas, realm de Keycloak y configuración versionados; Compose para el piloto y Helm/OpenTofu en fase 8 |
 | P11 | Decisiones en ADRs que Claude lee antes de proponer cambios | `docs/adr/` + comando `/adr` |
 | P12 | Tecnología mayoritaria, con soporte largo | Criterio en cada ADR |
 | **P13** | **Configuración antes que código**: todo lo que varía entre empresas es dato | Suite de aceptación con dos plantillas (`docs/specs/parametrizacion.md`) |
 | **P14** | **Liviano para una MacBook M1 de 8 GB** | Desarrollo nativo: cero contenedores (PostgreSQL local, Keycloak en `.local/`; ADR-0020) |
 
-## 3. Stack (versiones: la última estable al iniciar el paso 0.2, fijada en `package.json` y en Compose)
+## 3. Stack (versiones: la última estable al iniciar el paso 0.2, fijada en `package.json` y en `docs/fase0/guia-de-ejecucion.md`; Compose solo desde el piloto)
 
 | ADR | Tema | Decisión | Licencia |
 | --- | --- | --- | --- |

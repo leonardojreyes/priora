@@ -6,7 +6,7 @@
 
 ## Fase 0 · Esqueleto (FASE0.md)
 - [x] 0.1 Decisiones fundacionales y ADR aceptados
-- [ ] 0.2 Monorepo, Compose y esqueleto que levanta con `pnpm bootstrap && pnpm dev`
+- [x] 0.2 Monorepo, Compose y esqueleto que levanta con `pnpm bootstrap && pnpm dev`
 - [ ] 0.3 Context engineering verificado (hooks en macOS y Windows, módulo `ping` generado sin correcciones)
 - [ ] 0.4 CI que bloquea un PR con secreto, licencia GPL e importación prohibida
 - [ ] 0.5 Look and feel aprobado (tokens, ~15 componentes, 5 pantallas plantilla)

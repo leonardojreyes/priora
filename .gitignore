@@ -18,3 +18,8 @@ Thumbs.db
 data/
 storage/
 .claude/settings.local.json
+.local/
+
+# Next.js generado
+next-env.d.ts
+*.tsbuildinfo
