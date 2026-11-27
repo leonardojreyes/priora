@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto cerrado (T1 a T15, rama `fase0/0.2`), pendiente de aprobación del responsable y de PR.
-- **Siguiente acción:** el responsable aprueba el reporte del paso 0.2; luego `/clear`, `/estado` y paso 0.3 (context engineering). Keycloak local en `.local/`, `priora` y `priora_test` migradas, `.env.local` con las URLs. Repo git local; no hacer push ni abrir PR sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto cerrado y aprobado por el responsable el 2026-11-27 (T1 a T15, rama `fase0/0.2` empujada; `main` ya existe en el remoto). PR a `main` sin abrir.
+- **Siguiente acción:** `/clear`, `/estado` y paso 0.3 (context engineering) en la rama `fase0/0.3`; decidir cuándo abrir el PR de 0.2. Keycloak local en `.local/`, `priora` y `priora_test` migradas, `.env.local` con las URLs. No abrir PR sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
