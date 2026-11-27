@@ -35,8 +35,9 @@ Toda la configuración de Priora entra por variables de entorno (ADR-0020 §4): 
 | `OIDC_ISSUER_URL`         | `http://127.0.0.1:8180/realms/priora`    | Emisor OIDC; la API valida tokens contra él                 |
 | `OIDC_CLIENT_ID`          | `priora-web`                             | Cliente OIDC de la web                                      |
 | `OIDC_CLIENT_SECRET`      | vacío (`keycloak:realm`)                 | Secreto del cliente; solo en `.env.local`                   |
-| `KEYCLOAK_ADMIN_USER`     | `admin`                                  | Administrador local de Keycloak                             |
+| `KEYCLOAK_ADMIN_USER`     | `priora-admin`                           | Administrador local de Keycloak (`keycloak:realm` lo escribe en `.env.local`) |
 | `KEYCLOAK_ADMIN_PASSWORD` | vacío (`keycloak:realm`)                 | Contraseña del administrador; solo en `.env.local`          |
+| `KEYCLOAK_LOG_LEVEL`      | `info`                                   | Nivel de registro de Keycloak al arrancar con `keycloak:start` |
 
 ## Reglas
 

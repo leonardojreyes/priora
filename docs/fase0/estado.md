@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T11 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T12` (Keycloak local: `keycloak:install|start|stop|status|reset|realm`; descarga con SHA-256 fijado y JRE en `.local/`). T12 es la tarea que más RAM y red usa: confirmar antes con el responsable. `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T12 hechas.
+- **Siguiente acción:** `/clear`, `/estado` y `/implement T13` (`pnpm bootstrap`, `pnpm dev` y `pnpm ram-report`; `dev` debe levantar api + worker + web y apagarlos con Ctrl+C). Keycloak local ya está instalado en `.local/` (copiado de sig-iso, mismas versiones y huellas) y su realm `priora` generado. `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -58,6 +58,7 @@
 
 ## Historial resumido
 
+- 2026-11-26 · 0.2 T12: Keycloak local. `pnpm keycloak:install|start|stop|status|reset|realm` (adaptado de sig-iso: Keycloak 26.8.2 y JRE Temurin 21.0.13+9 con SHA-256 fijado; solo en `127.0.0.1:8180`, heap de 512 MB). Realm `priora` desde `infra/keycloak/realm-priora.plantilla.json` (sin usuarios hasta 0.6; cliente `priora-web` confidencial con PKCE S256); el realm resuelto y los secretos quedan en `.local/` y `.env.local` (0600). La instalación se copió de `sig-iso/.local` (sin `data/`) en lugar de volver a descargarla; la marca `.instalado.json` coincide con las huellas fijadas. Probado a mano: arranca, el realm responde en `/realms/priora` y se detiene. 59 pruebas de unidad nuevas. Mientras corre no conviene tener el Keycloak de sig-iso (8080) por la RAM.
 - 2026-11-26 · 0.2 T11: `apps/web` (Next.js 16.4.6, React 19.3.1, next-intl 4.16.2, MIT): página "Priora" con la lista de 6 módulos (entrada, clasificación, priorización, decisiones, ejecución, indicadores) con textos en `messages/es-EC.json`; sin nombres de la plantilla bancaria (la prueba lo verifica). `packages/ui` vacío. `apps/web/scripts/next.mjs` lanza `next` sin telemetría y con `WEB_PORT` (3000). Vitest usa jsdom y `oxc.jsx` (Vite 8). `next-env.d.ts` y `*.tsbuildinfo` ignorados. Sin Tailwind ni shadcn hasta 0.5.
 - 2026-11-26 · 0.2 T10: `apps/worker` (ESM, pg-boss 12.39.0 MIT) como `priora_app` con `migrate:false` y `createSchema:false`; cola `ping` cuyo manejador exige `tenant_id` (ADR-0008) y deja una línea de registro; si falta, el trabajo falla. `pnpm --filter @priora/worker build|start|test` (la integración usa `priora_test`, migrada con `pnpm db:migrate -- --prueba`). Apagado limpio con SIGINT/SIGTERM.
 - 2026-11-26 · 0.2 T9: `packages/contracts` con `openapi.json` (OpenAPI 3.1 generado desde la API con `apps/api/src/generar-openapi.ts`, sin base) y cliente orval 8.49.0 (MIT, fetch, un archivo) en `src/generated/api.ts`; `getHealth` con `operationId` fijo. `pnpm contracts:generate` y `pnpm contracts:check` (falla ante deriva de contrato o cliente; `scripts/lib/contratos.mjs`). El paquete se consume como TS fuente (`moduleResolution: Bundler`). Código generado excluido de Prettier y ESLint. orval agrega muchas dependencias transitivas: revisar licencias en 0.4.

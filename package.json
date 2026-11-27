@@ -22,7 +22,13 @@
     "db:reset": "node scripts/db-reset.mjs",
     "test:integration": "pnpm --filter @priora/scripts test",
     "contracts:generate": "node scripts/contratos.mjs generate",
-    "contracts:check": "node scripts/contratos.mjs check"
+    "contracts:check": "node scripts/contratos.mjs check",
+    "keycloak:install": "node scripts/keycloak-dev.mjs install",
+    "keycloak:start": "node scripts/keycloak-dev.mjs start",
+    "keycloak:stop": "node scripts/keycloak-dev.mjs stop",
+    "keycloak:status": "node scripts/keycloak-dev.mjs status",
+    "keycloak:reset": "node scripts/keycloak-dev.mjs reset",
+    "keycloak:realm": "node scripts/keycloak-realm.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
