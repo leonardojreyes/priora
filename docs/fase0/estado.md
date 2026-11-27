@@ -5,8 +5,8 @@
 ## Ahora
 
 - **Fase:** 0 (ligera)
-- **Paso actual:** 0.2 Repositorio y esqueleto, rama `fase0/0.2`. Plan y tareas aprobados (`docs/specs/features/paso-0.2-esqueleto.md`). T1 a T14 hechas.
-- **Siguiente acción:** `/clear`, `/estado` y `/implement T15` (documentación y reporte final del paso 0.2; luego marcar 0.2 en `TODO.md`). Keycloak local ya está instalado en `.local/` (copiado de sig-iso, mismas versiones y huellas) y su realm `priora` generado. `db:init` y `db:migrate` ya se ejecutaron en la máquina del responsable: `priora` y `priora_test` migradas (esquema `pgboss` creado), `.env.local` con las 3 URLs. Repo git local creado; no hacer push sin que el responsable lo pida.
+- **Paso actual:** 0.2 Repositorio y esqueleto cerrado (T1 a T15, rama `fase0/0.2`), pendiente de aprobación del responsable y de PR.
+- **Siguiente acción:** el responsable aprueba el reporte del paso 0.2; luego `/clear`, `/estado` y paso 0.3 (context engineering). Keycloak local en `.local/`, `priora` y `priora_test` migradas, `.env.local` con las URLs. Repo git local; no hacer push ni abrir PR sin que el responsable lo pida.
 
 ## Decisiones tomadas (antes de abrir Claude Code)
 
@@ -58,6 +58,7 @@
 
 ## Historial resumido
 
+- 2026-11-27 · 0.2 T15: documentación y permisos. `ARCHITECTURE.md` (§2 sin Mailpit ni Compose en desarrollo, §6 con `infra/{db,keycloak}` y `.local/`), `base-tecnica.md` (P10 y §3), nota de desviación ADR-0020 en `FASE0.md` §0.2, `README.md` (requisitos sin Docker y arranque), `docs/fase0/guia-de-ejecucion.md` nueva (comandos, versiones, problemas frecuentes) y `.claude/settings.json` sin `docker compose` y con `pnpm db:*` y `pnpm keycloak:*` (`db:reset` sigue pidiendo confirmación). Prueba `scripts/test/documentacion.test.mjs` (13) vigila enlaces y permisos. `pnpm build`, `test`, `typecheck`, `lint` y `lint:arch` en verde.
 - 2026-11-27 · 0.2 T14: `pnpm verificar:esqueleto` consulta `/health` (200, `status: ok`, `db: up`) y la web (200) con tope de 3 s; comprueba ambos aunque falle uno y sale con código 1 con un mensaje que nombra el servicio, la URL y `pnpm dev` (o PostgreSQL si `db` no está `up`). Lógica en `scripts/lib/verificar-esqueleto.mjs` (18 pruebas con `fetch` simulado). Probado en macOS en rojo (sin `dev`) y en verde (con `dev`).
 - 2026-11-27 · 0.2 T13: `pnpm bootstrap` (db:init, migraciones de desarrollo y pruebas, semilla, instala Keycloak si falta, realm; idempotente), `pnpm dev` (comprueba PostgreSQL como error y Keycloak como aviso, compila api y worker, levanta api + worker + web y los apaga con Ctrl+C o si uno cae) y `pnpm ram-report` (node/java/postgres con `ps` o `tasklist`). Lógica pura en `scripts/lib/orquestacion.mjs` (24 pruebas). Probado en macOS: `/health` 200 con `db: up`, web 200, tras SIGINT sin procesos ni puertos abiertos; con api + worker + web ~260 MB de node (Keycloak apagado). `next.config.ts` con `agentRules: false` para que Next no genere `AGENTS.md`. Windows sin probar.
 - 2026-11-26 · 0.2 T12: Keycloak local. `pnpm keycloak:install|start|stop|status|reset|realm` (adaptado de sig-iso: Keycloak 26.8.2 y JRE Temurin 21.0.13+9 con SHA-256 fijado; solo en `127.0.0.1:8180`, heap de 512 MB). Realm `priora` desde `infra/keycloak/realm-priora.plantilla.json` (sin usuarios hasta 0.6; cliente `priora-web` confidencial con PKCE S256); el realm resuelto y los secretos quedan en `.local/` y `.env.local` (0600). La instalación se copió de `sig-iso/.local` (sin `data/`) en lugar de volver a descargarla; la marca `.instalado.json` coincide con las huellas fijadas. Probado a mano: arranca, el realm responde en `/realms/priora` y se detiene. 59 pruebas de unidad nuevas. Mientras corre no conviene tener el Keycloak de sig-iso (8080) por la RAM.

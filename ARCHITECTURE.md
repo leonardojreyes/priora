@@ -26,9 +26,11 @@ flowchart LR
 | `apps/web` | Next.js | Interfaz, formularios dinámicos, diagramas, tableros |
 | `apps/api` | NestJS | API REST `/api/v1`, OpenAPI, autenticación, casos de uso |
 | `apps/worker` | Node + pg-boss | Temporizadores, vencimientos, notificaciones, refresco de indicadores, outbox |
-| PostgreSQL | — | Datos de negocio, configuración versionada, bitácora, colas |
-| Keycloak | — | Identidad, SSO, roles de plataforma |
-| Mailpit (dev) / SMTP | — | Correo |
+| PostgreSQL | — | Datos de negocio, configuración versionada, bitácora, colas. En desarrollo, el PostgreSQL local (16.x) con las bases `priora` y `priora_test` |
+| Keycloak | — | Identidad, SSO, roles de plataforma. En desarrollo corre nativo desde `.local/` (ADR-0020) |
+| SMTP | — | Correo. Sin servidor de correo en desarrollo hasta la fase 2 (notificaciones) |
+
+En desarrollo no hay contenedores (ADR-0020): `pnpm bootstrap` prepara las bases y Keycloak, y `pnpm dev` levanta API, worker y web. Compose queda para el despliegue del piloto.
 
 ## 3. Módulos (`modules/`)
 
@@ -101,8 +103,9 @@ priora/
 ├── modules/<modulo>/{domain,application,infrastructure,interface}
 ├── packages/{workflow-engine,contracts,ui,config}
 ├── plantillas/{marco-tic-banca,generica-simple}
-├── infra/{keycloak,compose}            # fase 8: helm/, tofu/
-├── scripts/                            # utilidades en Node (multiplataforma)
+├── infra/{db,keycloak}                 # db: esquema y migraciones; keycloak: plantilla del realm. Piloto: compose/. Fase 8: helm/, tofu/
+├── scripts/                            # utilidades en Node (multiplataforma): bootstrap, dev, db:*, keycloak:*
+├── .local/                             # Keycloak, JRE y datos locales (no se versiona)
 ├── docs/{fase0,fases,specs,adr,referencia,security,releases}
 └── .claude/{agents,commands,hooks,settings.json}
 ```

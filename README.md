@@ -24,9 +24,20 @@ Después de la Fase 0: `/fase 1`, `/fase 2`… (ver `FASE0.md` §9).
 - `plantillas/`: configuración de empresas (`marco-tic-banca`, `generica-simple`).
 - `.claude/`: subagentes, comandos, hooks y permisos del proyecto.
 
-## Requisitos (se confirman en el paso 0.2)
+## Requisitos
 
-Node.js LTS, pnpm, Docker Desktop (o equivalente) y Git. macOS o Windows (con WSL2 recomendado para Docker). 8 GB de RAM como mínimo.
+Node.js 22 LTS (`.nvmrc`), pnpm 12, Git y PostgreSQL 16.x instalado localmente, con un usuario que pueda crear roles y bases. No se necesita Docker (ADR-0020). macOS o Windows; 8 GB de RAM como mínimo.
+
+## Arrancar el esqueleto
+
+```
+pnpm install
+pnpm bootstrap   # bases, migraciones, semilla y Keycloak local
+pnpm dev         # api (3001) + worker + web (3000)
+pnpm verificar:esqueleto
+```
+
+Guía completa, variables y solución de problemas: `docs/fase0/guia-de-ejecucion.md`.
 
 ## Confidencialidad
 
