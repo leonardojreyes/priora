@@ -31,7 +31,8 @@
     "keycloak:realm": "node scripts/keycloak-realm.mjs",
     "bootstrap": "node scripts/bootstrap.mjs",
     "dev": "node scripts/dev.mjs",
-    "ram-report": "node scripts/ram-report.mjs"
+    "ram-report": "node scripts/ram-report.mjs",
+    "verificar:esqueleto": "node scripts/verificar-esqueleto.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

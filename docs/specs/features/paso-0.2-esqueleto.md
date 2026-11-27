@@ -110,7 +110,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 
 **Bloque F · Integración de punta a punta**
 - [x] **T13** · `pnpm bootstrap`, `pnpm dev` (api + worker + web, comprobando PostgreSQL y Keycloak) y `pnpm ram-report` · `bootstrap` es idempotente y `dev` levanta los tres procesos y los apaga con Ctrl+C · `pnpm bootstrap && pnpm dev` (en otra terminal, `pnpm ram-report`) · Dep.: T7, T8, T10, T11, T12.
-- [ ] **T14** · `pnpm verificar:esqueleto` (consulta `/health` y la web) · imprime verde con `dev` corriendo; falla con un mensaje claro si algo no responde · `pnpm verificar:esqueleto` · Dep.: T13.
+- [x] **T14** · `pnpm verificar:esqueleto` (consulta `/health` y la web) · imprime verde con `dev` corriendo; falla con un mensaje claro si algo no responde · `pnpm verificar:esqueleto` · Dep.: T13.
 
 **Bloque G · Cierre**
 - [ ] **T15** · Documentación y permisos: `ARCHITECTURE.md` (§2 y §6), `docs/fase0/base-tecnica.md` (P10 y §3), nota de desviación en `FASE0.md` §0.2, `README.md`, `.claude/settings.json` (quitar `docker compose`; permitir `pnpm db:*` y `pnpm keycloak:*`), `docs/fase0/guia-de-ejecucion.md`, estado y `TODO.md` · todos los enlaces resuelven, y `pnpm build && pnpm test && pnpm lint && pnpm lint:arch` en verde · `pnpm build && pnpm test && pnpm lint && pnpm lint:arch` · Dep.: T1 a T14.
