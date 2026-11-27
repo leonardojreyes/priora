@@ -109,7 +109,7 @@ Cada tarea es una sesión de `/implement`, deja el repositorio en verde y se ver
 - [x] **T12** · Keycloak local: `keycloak:install` (descarga con SHA-256 fijado, JRE en `.local/`), `start|stop|status|reset`, `keycloak:realm` desde `infra/keycloak/realm-priora.plantilla.json`; puerto configurable distinto del de sig-iso; rutas de Windows (`kc.bat`) · pruebas de unidad de las funciones puras (checksum, plan de descarga, argumentos de arranque, plantilla del realm) · `pnpm test -- keycloak` y, manualmente, `pnpm keycloak:install && pnpm keycloak:realm && pnpm keycloak:start && pnpm keycloak:status` · Dep.: T2.
 
 **Bloque F · Integración de punta a punta**
-- [ ] **T13** · `pnpm bootstrap`, `pnpm dev` (api + worker + web, comprobando PostgreSQL y Keycloak) y `pnpm ram-report` · `bootstrap` es idempotente y `dev` levanta los tres procesos y los apaga con Ctrl+C · `pnpm bootstrap && pnpm dev` (en otra terminal, `pnpm ram-report`) · Dep.: T7, T8, T10, T11, T12.
+- [x] **T13** · `pnpm bootstrap`, `pnpm dev` (api + worker + web, comprobando PostgreSQL y Keycloak) y `pnpm ram-report` · `bootstrap` es idempotente y `dev` levanta los tres procesos y los apaga con Ctrl+C · `pnpm bootstrap && pnpm dev` (en otra terminal, `pnpm ram-report`) · Dep.: T7, T8, T10, T11, T12.
 - [ ] **T14** · `pnpm verificar:esqueleto` (consulta `/health` y la web) · imprime verde con `dev` corriendo; falla con un mensaje claro si algo no responde · `pnpm verificar:esqueleto` · Dep.: T13.
 
 **Bloque G · Cierre**

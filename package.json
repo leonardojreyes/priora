@@ -28,7 +28,10 @@
     "keycloak:stop": "node scripts/keycloak-dev.mjs stop",
     "keycloak:status": "node scripts/keycloak-dev.mjs status",
     "keycloak:reset": "node scripts/keycloak-dev.mjs reset",
-    "keycloak:realm": "node scripts/keycloak-realm.mjs"
+    "keycloak:realm": "node scripts/keycloak-realm.mjs",
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "dev": "node scripts/dev.mjs",
+    "ram-report": "node scripts/ram-report.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
